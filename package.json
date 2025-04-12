@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "next build && echo 'Build completed successfully'",
+    "build": "node scripts/vercel-build.js",
     "start": "next start",
     "lint": "next lint",
     "db:setup": "node scripts/db-setup.js",
