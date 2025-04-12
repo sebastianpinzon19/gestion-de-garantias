@@ -2,9 +2,10 @@
   "name": "gestion-de-garantias",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/build.js",
     "start": "next start",
     "lint": "next lint",
     "db:setup": "node scripts/db-setup.js",
@@ -40,7 +41,6 @@
     "tailwind-merge": "^2.2.2",
     "zod": "^3.22.4"
   },
-  "type": "module",
   "devDependencies": {
     "@types/node": "^20.11.30",
     "@types/react": "^18.2.69",
