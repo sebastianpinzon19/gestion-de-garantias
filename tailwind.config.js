@@ -7,7 +7,9 @@ module.exports = {
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './src/**/*.{js,ts,jsx,tsx,mdx}',
     './lib/**/*.{js,ts,jsx,tsx,mdx}',
-    './providers/**/*.{js,ts,jsx,tsx,mdx}'
+    './providers/**/*.{js,ts,jsx,tsx,mdx}',
+    // Añadir más rutas para asegurar la detección de clases
+    './*.{js,ts,jsx,tsx,mdx}'
   ],
   theme: {
     container: {
@@ -75,4 +77,4 @@ module.exports = {
     },
   },
   plugins: [require("tailwindcss-animate")],
-}
+};
