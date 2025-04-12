@@ -6,7 +6,7 @@ import path from 'path';
 
 async function vercelBuild() {
   try {
-    console.log('Starting Vercel build process...');
+    console.log('🚀 Starting Vercel build process...');
 
     // Verificar variables de entorno
     const requiredEnvVars = [
@@ -17,29 +17,55 @@ async function vercelBuild() {
       'NEXTAUTH_URL'
     ];
 
-    requiredEnvVars.forEach(varName => {
-      if (!process.env[varName]) {
-        console.warn(`⚠️ Warning: ${varName} environment variable is not set`);
+    let missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+    if (missingVars.length > 0) {
+      console.error(`❌ Missing required environment variables: ${missingVars.join(', ')}`);
+      process.exit(1);
+    }
+
+    // Verificar existencia de archivos de configuración
+    const configFiles = [
+      'prisma/schema.prisma',
+      'next.config.js',
+      'package.json'
+    ];
+
+    configFiles.forEach(file => {
+      if (!fs.existsSync(path.resolve(process.cwd(), file))) {
+        console.error(`❌ Missing configuration file: ${file}`);
+        process.exit(1);
       }
     });
 
+    // Instalar dependencias
+    console.log('📦 Installing dependencies...');
+    execSync('pnpm install', { stdio: 'inherit' });
+
     // Generar Prisma Client
-    console.log('Generating Prisma Client...');
+    console.log('🔧 Generating Prisma Client...');
     execSync('npx prisma generate', { stdio: 'inherit' });
 
-    // Migrar base de datos (opcional, comentar si no se requiere)
-    console.log('Running database migrations...');
+    // Migrar base de datos (opcional)
+    console.log('💾 Running database migrations...');
     try {
       execSync('npx prisma migrate deploy', { stdio: 'inherit' });
     } catch (migrationError) {
-      console.error('Migration failed, but continuing build:', migrationError.message);
+      console.warn('⚠️ Migration failed, but continuing build:', migrationError.message);
     }
 
     // Construir la aplicación Next.js
-    console.log('Building Next.js application...');
+    console.log('🏗️ Building Next.js application...');
     execSync('next build', { stdio: 'inherit' });
 
+    // Verificar directorio de construcción
+    const buildDir = path.resolve(process.cwd(), '.next');
+    if (!fs.existsSync(buildDir)) {
+      console.error('❌ Build directory not created');
+      process.exit(1);
+    }
+
     console.log('✅ Vercel build completed successfully!');
+    process.exit(0);
   } catch (error) {
     console.error('❌ Build failed:', error);
     process.exit(1);
