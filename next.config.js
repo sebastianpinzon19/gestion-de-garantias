@@ -12,13 +12,7 @@ module.exports = {
   },
   
   images: {
-    domains: ['localhost'],
-    unoptimized: false
-  },
-  
-  experimental: {
-    webpackBuildWorker: true,
-    serverActions: true
+    unoptimized: true
   },
   
   typescript: {
@@ -27,12 +21,5 @@ module.exports = {
   
   eslint: {
     ignoreDuringBuilds: true
-  },
-  
-  postcss: {
-    plugins: {
-      'tailwindcss': {},
-      'autoprefixer': {},
-    },
   }
 };
