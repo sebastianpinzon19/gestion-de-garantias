@@ -2,8 +2,15 @@
   "version": 2,
   "builds": [
     {
-      "src": "package.json",
-      "use": "@vercel/next"
+      "src": "next.config.mjs",
+      "use": "@vercel/next",
+      "config": {
+        "maxLambdaSize": "15mb",
+        "includeFiles": [
+          "prisma/schema.prisma",
+          "lib/generated/prisma/**"
+        ]
+      }
     }
   ],
   "routes": [
@@ -11,5 +18,11 @@
       "src": "/(.*)",
       "dest": "/"
     }
-  ]
+  ],
+  "env": {
+    "PRISMA_GENERATE_SKIP_AUTOINSTALL": "true"
+  },
+  "buildCommand": "pnpm run build",
+  "installCommand": "pnpm install",
+  "devCommand": "pnpm dev"
 }
