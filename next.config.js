@@ -21,5 +21,18 @@ module.exports = {
   
   eslint: {
     ignoreDuringBuilds: true
+  },
+  
+  // Añadir más información de depuración
+  logging: {
+    level: 'verbose'
+  },
+  
+  // Configuración experimental para más información
+  experimental: {
+    serverActions: true,
+    logging: {
+      level: 'verbose'
+    }
   }
 };

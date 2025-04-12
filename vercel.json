@@ -2,8 +2,21 @@
   "version": 2,
   "builds": [
     {
-      "src": "package.json",
+      "src": "package.json", 
       "use": "@vercel/next"
     }
-  ]
+  ],
+  "routes": [
+    {
+      "src": "/(.*)", 
+      "dest": "/"
+    }
+  ],
+  "env": {
+    "PRISMA_GENERATE_SKIP_AUTOINSTALL": "true",
+    "NODE_ENV": "production"
+  },
+  "buildCommand": "pnpm run build",
+  "installCommand": "pnpm install",
+  "devCommand": "pnpm dev"
 }
