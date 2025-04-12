@@ -25,11 +25,18 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
+    domains: ['localhost'],
   },
   experimental: {
     webpackBuildWorker: true,
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
+  },
+  postcss: {
+    plugins: {
+      'tailwindcss': {},
+      'autoprefixer': {},
+    },
   },
   webpack: (config) => {
     config.resolve.fallback = { fs: false, net: false, tls: false };

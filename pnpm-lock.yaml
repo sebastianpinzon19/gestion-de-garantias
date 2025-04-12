@@ -47,9 +47,6 @@ importers:
       '@radix-ui/react-toast':
         specifier: ^1.1.5
         version: 1.2.7(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      autoprefixer:
-        specifier: ^10.4.19
-        version: 10.4.21(postcss@8.5.3)
       bcryptjs:
         specifier: ^2.4.3
         version: 2.4.3
@@ -71,12 +68,6 @@ importers:
       nodemailer:
         specifier: ^6.9.13
         version: 6.10.0
-      postcss:
-        specifier: ^8.4.38
-        version: 8.5.3
-      postcss-import:
-        specifier: ^16.1.0
-        version: 16.1.0(postcss@8.5.3)
       prisma:
         specifier: ^5.10.2
         version: 5.22.0
@@ -92,12 +83,6 @@ importers:
       tailwind-merge:
         specifier: ^2.2.2
         version: 2.6.0
-      tailwindcss:
-        specifier: ^3.4.3
-        version: 3.4.17
-      tailwindcss-animate:
-        specifier: ^1.0.7
-        version: 1.0.7(tailwindcss@3.4.17)
       zod:
         specifier: ^3.22.4
         version: 3.24.2
@@ -111,6 +96,21 @@ importers:
       '@types/react-dom':
         specifier: ^18.2.22
         version: 18.3.6(@types/react@18.3.20)
+      autoprefixer:
+        specifier: ^10.4.19
+        version: 10.4.21(postcss@8.5.3)
+      postcss:
+        specifier: ^8.4.38
+        version: 8.5.3
+      postcss-import:
+        specifier: ^16.1.0
+        version: 16.1.0(postcss@8.5.3)
+      tailwindcss:
+        specifier: ^3.4.3
+        version: 3.4.17
+      tailwindcss-animate:
+        specifier: ^1.0.7
+        version: 1.0.7(tailwindcss@3.4.17)
       typescript:
         specifier: ^5.4.2
         version: 5.8.3
