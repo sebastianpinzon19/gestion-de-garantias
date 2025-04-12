@@ -14,9 +14,6 @@ try {
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // Eliminar exportación estática para compatibilidad con Vercel
-  // output: 'export',
-  // trailingSlash: true,
   
   env: {
     DATABASE_URL: process.env.VERCEL_DATABASE_URL || process.env.LOCAL_DATABASE_URL
@@ -43,7 +40,6 @@ const nextConfig = {
     level: 'verbose'
   },
   
-  // Configuración de compilación
   typescript: {
     ignoreBuildErrors: true
   },
@@ -52,7 +48,6 @@ const nextConfig = {
     ignoreDuringBuilds: true
   },
   
-  // Configuración de PostCSS
   postcss: {
     plugins: {
       'tailwindcss': {},
@@ -80,4 +75,4 @@ if (userConfig) {
   }
 }
 
-export default nextConfig
+module.exports = nextConfig;
