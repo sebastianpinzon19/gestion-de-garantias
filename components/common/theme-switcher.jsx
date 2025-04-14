@@ -1,13 +1,11 @@
 "use client"
 
 import { useTheme } from "@/providers/theme-provider"
-import { useLanguage } from "@/providers/language-provider"
 import { Button } from "@/components/ui/button"
 import { Moon, Sun } from "lucide-react"
 
 export default function ThemeSwitcher() {
   const { theme, toggleTheme } = useTheme()
-  const { t } = useLanguage()
 
   return (
     <Button
@@ -18,9 +16,8 @@ export default function ThemeSwitcher() {
     >
       {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
       <span className="sr-only md:not-sr-only md:inline-block">
-        {theme === "light" ? t("darkMode") : t("lightMode")}
+        {theme === "light" ? "Dark Mode" : "Light Mode"}
       </span>
     </Button>
   )
 }
-

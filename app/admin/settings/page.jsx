@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useLanguage } from "@/providers/language-provider"
 import { useTheme } from "@/providers/theme-provider"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -14,25 +13,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/components/ui/use-toast"
 
 export default function SettingsPage() {
-  const { t } = useLanguage()
   const { theme } = useTheme()
   const { toast } = useToast()
 
   const [generalSettings, setGeneralSettings] = useState({
-    companyName: "Mi Empresa",
-    email: "contacto@miempresa.com",
+    companyName: "My Company",
+    email: "contact@mycompany.com",
     phone: "+1234567890",
-    address: "Calle Principal #123, Ciudad",
+    address: "Main Street #123, City",
     logo: "",
   })
 
   const [emailSettings, setEmailSettings] = useState({
-    smtpServer: "smtp.ejemplo.com",
+    smtpServer: "smtp.example.com",
     smtpPort: "587",
-    smtpUser: "usuario@ejemplo.com",
+    smtpUser: "user@example.com",
     smtpPassword: "********",
-    fromEmail: "notificaciones@miempresa.com",
-    fromName: "Sistema de Garantías",
+    fromEmail: "notifications@mycompany.com",
+    fromName: "Warranty System",
   })
 
   const [notificationSettings, setNotificationSettings] = useState({
@@ -58,10 +56,10 @@ export default function SettingsPage() {
   }
 
   const handleSaveSettings = (type) => {
-    // En una implementación real, esto enviaría los datos a la API
+    // In a real implementation, this would send data to the API
     toast({
-      title: t("settingsSaved"),
-      description: t("settingsSavedDesc"),
+      title: "Settings Saved",
+      description: "Your settings have been successfully updated",
       variant: "success",
     })
   }
@@ -69,28 +67,28 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight">{t("settings")}</h2>
-        <p className="text-muted-foreground">{t("settingsDesc")}</p>
+        <h2 className="text-3xl font-bold tracking-tight">Settings</h2>
+        <p className="text-muted-foreground">Configure system settings and preferences</p>
       </div>
 
       <Tabs defaultValue="general" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="general">{t("general")}</TabsTrigger>
-          <TabsTrigger value="email">{t("email")}</TabsTrigger>
-          <TabsTrigger value="notifications">{t("notifications")}</TabsTrigger>
-          <TabsTrigger value="appearance">{t("appearance")}</TabsTrigger>
+          <TabsTrigger value="general">General</TabsTrigger>
+          <TabsTrigger value="email">Email</TabsTrigger>
+          <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          <TabsTrigger value="appearance">Appearance</TabsTrigger>
         </TabsList>
 
         <TabsContent value="general">
           <Card>
             <CardHeader>
-              <CardTitle>{t("generalSettings")}</CardTitle>
-              <CardDescription>{t("generalSettingsDesc")}</CardDescription>
+              <CardTitle>General Settings</CardTitle>
+              <CardDescription>Configure basic company information</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="companyName">{t("companyName")}</Label>
+                  <Label htmlFor="companyName">Company Name</Label>
                   <Input
                     id="companyName"
                     name="companyName"
@@ -99,7 +97,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email">{t("email")}</Label>
+                  <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
                     name="email"
@@ -111,16 +109,16 @@ export default function SettingsPage() {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="phone">{t("phone")}</Label>
+                  <Label htmlFor="phone">Phone</Label>
                   <Input id="phone" name="phone" value={generalSettings.phone} onChange={handleGeneralChange} />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="logo">{t("logo")}</Label>
+                  <Label htmlFor="logo">Logo</Label>
                   <Input id="logo" name="logo" type="file" accept="image/*" className="cursor-pointer" />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="address">{t("address")}</Label>
+                <Label htmlFor="address">Address</Label>
                 <Textarea
                   id="address"
                   name="address"
@@ -132,7 +130,7 @@ export default function SettingsPage() {
             </CardContent>
             <CardFooter>
               <Button onClick={() => handleSaveSettings("general")} className="bg-blue-600 hover:bg-blue-700">
-                {t("saveChanges")}
+                Save Changes
               </Button>
             </CardFooter>
           </Card>
@@ -141,13 +139,13 @@ export default function SettingsPage() {
         <TabsContent value="email">
           <Card>
             <CardHeader>
-              <CardTitle>{t("emailSettings")}</CardTitle>
-              <CardDescription>{t("emailSettingsDesc")}</CardDescription>
+              <CardTitle>Email Settings</CardTitle>
+              <CardDescription>Configure SMTP and email notification settings</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="smtpServer">{t("smtpServer")}</Label>
+                  <Label htmlFor="smtpServer">SMTP Server</Label>
                   <Input
                     id="smtpServer"
                     name="smtpServer"
@@ -156,17 +154,17 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="smtpPort">{t("smtpPort")}</Label>
+                  <Label htmlFor="smtpPort">SMTP Port</Label>
                   <Input id="smtpPort" name="smtpPort" value={emailSettings.smtpPort} onChange={handleEmailChange} />
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="smtpUser">{t("smtpUser")}</Label>
+                  <Label htmlFor="smtpUser">SMTP User</Label>
                   <Input id="smtpUser" name="smtpUser" value={emailSettings.smtpUser} onChange={handleEmailChange} />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="smtpPassword">{t("smtpPassword")}</Label>
+                  <Label htmlFor="smtpPassword">SMTP Password</Label>
                   <Input
                     id="smtpPassword"
                     name="smtpPassword"
@@ -178,7 +176,7 @@ export default function SettingsPage() {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="fromEmail">{t("fromEmail")}</Label>
+                  <Label htmlFor="fromEmail">From Email</Label>
                   <Input
                     id="fromEmail"
                     name="fromEmail"
@@ -188,14 +186,14 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="fromName">{t("fromName")}</Label>
+                  <Label htmlFor="fromName">From Name</Label>
                   <Input id="fromName" name="fromName" value={emailSettings.fromName} onChange={handleEmailChange} />
                 </div>
               </div>
             </CardContent>
             <CardFooter>
               <Button onClick={() => handleSaveSettings("email")} className="bg-blue-600 hover:bg-blue-700">
-                {t("saveChanges")}
+                Save Changes
               </Button>
             </CardFooter>
           </Card>
@@ -204,14 +202,16 @@ export default function SettingsPage() {
         <TabsContent value="notifications">
           <Card>
             <CardHeader>
-              <CardTitle>{t("notificationSettings")}</CardTitle>
-              <CardDescription>{t("notificationSettingsDesc")}</CardDescription>
+              <CardTitle>Notification Settings</CardTitle>
+              <CardDescription>Configure email and system notification preferences</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>{t("emailNotifications")}</Label>
-                  <p className="text-sm text-muted-foreground">{t("emailNotificationsDesc")}</p>
+                  <Label>Email Notifications</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Receive email notifications for various system events
+                  </p>
                 </div>
                 <Switch
                   checked={notificationSettings.emailNotifications}
@@ -220,8 +220,10 @@ export default function SettingsPage() {
               </div>
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>{t("newWarrantyNotification")}</Label>
-                  <p className="text-sm text-muted-foreground">{t("newWarrantyNotificationDesc")}</p>
+                  <Label>New Warranty Notifications</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Get notified when a new warranty request is submitted
+                  </p>
                 </div>
                 <Switch
                   checked={notificationSettings.newWarrantyNotification}
@@ -231,8 +233,10 @@ export default function SettingsPage() {
               </div>
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>{t("statusChangeNotification")}</Label>
-                  <p className="text-sm text-muted-foreground">{t("statusChangeNotificationDesc")}</p>
+                  <Label>Status Change Notifications</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Receive updates when warranty status changes
+                  </p>
                 </div>
                 <Switch
                   checked={notificationSettings.statusChangeNotification}
@@ -242,8 +246,10 @@ export default function SettingsPage() {
               </div>
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>{t("reminderNotification")}</Label>
-                  <p className="text-sm text-muted-foreground">{t("reminderNotificationDesc")}</p>
+                  <Label>Reminder Notifications</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Send periodic reminders for pending warranties
+                  </p>
                 </div>
                 <Switch
                   checked={notificationSettings.reminderNotification}
@@ -253,8 +259,10 @@ export default function SettingsPage() {
               </div>
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>{t("dailySummary")}</Label>
-                  <p className="text-sm text-muted-foreground">{t("dailySummaryDesc")}</p>
+                  <Label>Daily Summary</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Receive a daily summary of warranty activities
+                  </p>
                 </div>
                 <Switch
                   checked={notificationSettings.dailySummary}
@@ -265,7 +273,7 @@ export default function SettingsPage() {
             </CardContent>
             <CardFooter>
               <Button onClick={() => handleSaveSettings("notifications")} className="bg-blue-600 hover:bg-blue-700">
-                {t("saveChanges")}
+                Save Changes
               </Button>
             </CardFooter>
           </Card>
@@ -274,49 +282,48 @@ export default function SettingsPage() {
         <TabsContent value="appearance">
           <Card>
             <CardHeader>
-              <CardTitle>{t("appearanceSettings")}</CardTitle>
-              <CardDescription>{t("appearanceSettingsDesc")}</CardDescription>
+              <CardTitle>Appearance Settings</CardTitle>
+              <CardDescription>Customize the look and feel of the application</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>{t("theme")}</Label>
+                <Label>Theme</Label>
                 <div className="flex gap-4">
                   <div
                     className={`border rounded-md p-4 cursor-pointer ${theme === "light" ? "border-blue-500 bg-blue-50 dark:bg-blue-900" : "border-gray-200 dark:border-gray-700"}`}
                   >
                     <div className="h-24 w-full bg-white border border-gray-200 rounded-md mb-2"></div>
-                    <p className="text-center">{t("lightTheme")}</p>
+                    <p className="text-center">Light Theme</p>
                   </div>
                   <div
                     className={`border rounded-md p-4 cursor-pointer ${theme === "dark" ? "border-blue-500 bg-blue-50 dark:bg-blue-900" : "border-gray-200 dark:border-gray-700"}`}
                   >
                     <div className="h-24 w-full bg-gray-900 border border-gray-700 rounded-md mb-2"></div>
-                    <p className="text-center">{t("darkTheme")}</p>
+                    <p className="text-center">Dark Theme</p>
                   </div>
                   <div
                     className={`border rounded-md p-4 cursor-pointer ${theme === "system" ? "border-blue-500 bg-blue-50 dark:bg-blue-900" : "border-gray-200 dark:border-gray-700"}`}
                   >
                     <div className="h-24 w-full bg-gradient-to-r from-white to-gray-900 border border-gray-200 rounded-md mb-2"></div>
-                    <p className="text-center">{t("systemTheme")}</p>
+                    <p className="text-center">System Theme</p>
                   </div>
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="language">{t("language")}</Label>
-                <Select defaultValue="es">
+                <Label htmlFor="language">Language</Label>
+                <Select defaultValue="en">
                   <SelectTrigger id="language">
-                    <SelectValue placeholder={t("selectLanguage")} />
+                    <SelectValue placeholder="Select Language" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="es">{t("spanish")}</SelectItem>
-                    <SelectItem value="en">{t("english")}</SelectItem>
+                    <SelectItem value="en">English</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </CardContent>
             <CardFooter>
               <Button onClick={() => handleSaveSettings("appearance")} className="bg-blue-600 hover:bg-blue-700">
-                {t("saveChanges")}
+                Save Changes
               </Button>
             </CardFooter>
           </Card>
@@ -325,4 +332,3 @@ export default function SettingsPage() {
     </div>
   )
 }
-

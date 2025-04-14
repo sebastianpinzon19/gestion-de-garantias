@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button"
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
-    pendientes: 0,
-    aprobadas: 0,
-    rechazadas: 0,
+    pending: 0,
+    approved: 0,
+    rejected: 0,
     total: 0,
   })
 
@@ -22,16 +22,16 @@ export default function Dashboard() {
         await new Promise((resolve) => setTimeout(resolve, 500))
 
         // This would be the API response
-        const response = await fetch("/api/garantias/stats")
+        const response = await fetch("/api/warranties/stats")
         if (response.ok) {
           const data = await response.json()
           setStats(data)
         } else {
           // Fallback to mock data if API fails
           setStats({
-            pendientes: 5,
-            aprobadas: 12,
-            rechazadas: 3,
+            pending: 5,
+            approved: 12,
+            rejected: 3,
             total: 20,
           })
         }
@@ -39,9 +39,9 @@ export default function Dashboard() {
         console.error("Error fetching stats:", error)
         // Fallback to mock data if API fails
         setStats({
-          pendientes: 5,
-          aprobadas: 12,
-          rechazadas: 3,
+          pending: 5,
+          approved: 12,
+          rejected: 3,
           total: 20,
         })
       }
@@ -53,10 +53,10 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-blue-800 dark:text-blue-300">Panel de Control</h1>
-        <Link href="/dashboard/garantias/nuevas">
+        <h1 className="text-3xl font-bold text-blue-800 dark:text-blue-300">Dashboard</h1>
+        <Link href="/dashboard/warranties/new">
           <Button className="bg-gradient-to-r from-blue-600 to-yellow-500 hover:from-blue-700 hover:to-yellow-600">
-            Ver Solicitudes Nuevas
+            View New Requests
           </Button>
         </Link>
       </div>
@@ -64,7 +64,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="bg-white border-l-4 border-blue-500 shadow-md hover:shadow-lg transition-shadow">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Total de Garantías</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-500">Total Warranties</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-blue-800">{stats.total}</div>
@@ -73,28 +73,28 @@ export default function Dashboard() {
 
         <Card className="bg-white border-l-4 border-yellow-500 shadow-md hover:shadow-lg transition-shadow">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Pendientes</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-500">Pending</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-yellow-500">{stats.pendientes}</div>
+            <div className="text-3xl font-bold text-yellow-500">{stats.pending}</div>
           </CardContent>
         </Card>
 
         <Card className="bg-white border-l-4 border-green-500 shadow-md hover:shadow-lg transition-shadow">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Aprobadas</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-500">Approved</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-green-500">{stats.aprobadas}</div>
+            <div className="text-3xl font-bold text-green-500">{stats.approved}</div>
           </CardContent>
         </Card>
 
         <Card className="bg-white border-l-4 border-red-500 shadow-md hover:shadow-lg transition-shadow">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Rechazadas</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-500">Rejected</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-red-500">{stats.rechazadas}</div>
+            <div className="text-3xl font-bold text-red-500">{stats.rejected}</div>
           </CardContent>
         </Card>
       </div>
@@ -102,8 +102,8 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="shadow-md hover:shadow-lg transition-shadow">
           <CardHeader>
-            <CardTitle className="text-blue-700">Actividad Reciente</CardTitle>
-            <CardDescription>Últimas solicitudes de garantía</CardDescription>
+            <CardTitle className="text-blue-700">Recent Activity</CardTitle>
+            <CardDescription>Latest warranty requests</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -111,9 +111,9 @@ export default function Dashboard() {
                 <div key={item} className="border-b pb-4 last:border-0 last:pb-0">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h4 className="font-medium">Garantía #{1000 + item}</h4>
-                      <p className="text-sm text-gray-500">Cliente: Juan Pérez</p>
-                      <p className="text-sm text-gray-500">Producto: Refrigerador XYZ-123</p>
+                      <h4 className="font-medium">Warranty #{1000 + item}</h4>
+                      <p className="text-sm text-gray-500">Customer: John Doe</p>
+                      <p className="text-sm text-gray-500">Product: Refrigerator XYZ-123</p>
                     </div>
                     <div className="text-sm">
                       <span
@@ -125,7 +125,7 @@ export default function Dashboard() {
                               : "bg-red-100 text-red-800"
                         }`}
                       >
-                        {item === 1 ? "Pendiente" : item === 2 ? "Aprobada" : "Rechazada"}
+                        {item === 1 ? "Pending" : item === 2 ? "Approved" : "Rejected"}
                       </span>
                     </div>
                   </div>
@@ -137,26 +137,26 @@ export default function Dashboard() {
 
         <Card className="shadow-md hover:shadow-lg transition-shadow">
           <CardHeader>
-            <CardTitle className="text-yellow-700">Acciones Rápidas</CardTitle>
-            <CardDescription>Accesos directos a funciones comunes</CardDescription>
+            <CardTitle className="text-yellow-700">Quick Actions</CardTitle>
+            <CardDescription>Direct access to common functions</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Link href="/dashboard/garantias/nuevas">
+            <Link href="/dashboard/warranties/new">
               <Button variant="outline" className="w-full justify-start border-blue-200 text-blue-700 hover:bg-blue-50">
-                Ver solicitudes pendientes
+                View Pending Requests
               </Button>
             </Link>
-            <Link href="/garantia/nueva">
+            <Link href="/warranty/new">
               <Button
                 variant="outline"
                 className="w-full justify-start border-yellow-200 text-yellow-700 hover:bg-yellow-50"
               >
-                Crear nueva solicitud
+                Create New Request
               </Button>
             </Link>
-            <Link href="/dashboard/garantias/historial">
+            <Link href="/dashboard/warranties/history">
               <Button variant="outline" className="w-full justify-start border-blue-200 text-blue-700 hover:bg-blue-50">
-                Ver historial completo
+                View Full History
               </Button>
             </Link>
           </CardContent>
@@ -165,4 +165,3 @@ export default function Dashboard() {
     </div>
   )
 }
-

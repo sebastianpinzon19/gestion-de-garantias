@@ -1,17 +1,12 @@
-"use client"
-
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { History, Home, FileText, PlusCircle, LogOut } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { FileText, History, Home, LogOut, Menu, PlusCircle } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { useLanguage } from "@/context/language-context"
-import LanguageSwitcher from "@/components/common/language-switcher"
 import ThemeSwitcher from "@/components/common/theme-switcher"
 
 export default function DashboardLayout({ children }) {
-  const { t } = useLanguage()
   const router = useRouter()
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -77,29 +72,28 @@ export default function DashboardLayout({ children }) {
               </SheetTrigger>
               <SheetContent side="left" className="w-64 p-0 bg-gray-900 text-white">
                 <div className="py-6 px-4 border-b border-gray-800">
-                  <h2 className="text-xl font-bold">{t("warrantySystem")}</h2>
-                  <p className="text-sm text-gray-400">{t("seller")}</p>
+                  <h2 className="text-xl font-bold">Warranty System</h2>
+                  <p className="text-sm text-gray-400">Seller</p>
                 </div>
                 <nav className="py-4">
-                  <MobileNavItems t={t} />
+                  <MobileNavItems />
                 </nav>
               </SheetContent>
             </Sheet>
 
             <Link href="/dashboard">
-              <h1 className="text-xl font-bold ml-2 md:ml-0">{t("warrantySystem")}</h1>
+              <h1 className="text-xl font-bold ml-2 md:ml-0">Warranty System</h1>
             </Link>
           </div>
 
           <div className="flex items-center gap-3">
-            <LanguageSwitcher />
             <ThemeSwitcher />
             <span className="hidden md:inline-block text-sm">
-              {t("welcome")}, {user?.name || t("seller")}
+              Welcome, {user?.name || "Seller"}
             </span>
             <Button variant="ghost" size="sm" onClick={handleLogout} className="text-white hover:bg-white/20">
               <LogOut className="h-4 w-4 mr-1" />
-              <span className="hidden md:inline-block">{t("logout")}</span>
+              <span className="hidden md:inline-block">Logout</span>
             </Button>
           </div>
         </div>
@@ -108,7 +102,7 @@ export default function DashboardLayout({ children }) {
       <div className="flex flex-1">
         <aside className="hidden md:block w-64 bg-gray-900 text-white">
           <nav className="py-6 px-4 space-y-1">
-            <DesktopNavItems t={t} />
+            <DesktopNavItems />
           </nav>
         </aside>
 
@@ -118,71 +112,70 @@ export default function DashboardLayout({ children }) {
   )
 }
 
-function DesktopNavItems({ t }) {
+function DesktopNavItems() {
   return (
     <>
       <Link href="/dashboard">
         <div className="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition-colors">
           <Home className="h-5 w-5 mr-3" />
-          <span>{t("dashboard")}</span>
+          <span>Dashboard</span>
         </div>
       </Link>
 
       <Link href="/dashboard/garantias">
         <div className="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition-colors">
           <FileText className="h-5 w-5 mr-3" />
-          <span>{t("warranties")}</span>
+          <span>Warranties</span>
         </div>
       </Link>
 
       <Link href="/dashboard/garantias/nuevas">
         <div className="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition-colors">
           <PlusCircle className="h-5 w-5 mr-3" />
-          <span>{t("pendingWarranties")}</span>
+          <span>Pending Warranties</span>
         </div>
       </Link>
 
       <Link href="/dashboard/garantias/historial">
         <div className="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition-colors">
           <History className="h-5 w-5 mr-3" />
-          <span>{t("history")}</span>
+          <span>History</span>
         </div>
       </Link>
     </>
   )
 }
 
-function MobileNavItems({ t }) {
+function MobileNavItems() {
   return (
     <>
       <Link href="/dashboard">
         <div className="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">
           <Home className="h-5 w-5 mr-3" />
-          <span>{t("dashboard")}</span>
+          <span>Dashboard</span>
         </div>
       </Link>
 
       <Link href="/dashboard/garantias">
         <div className="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">
           <FileText className="h-5 w-5 mr-3" />
-          <span>{t("warranties")}</span>
+          <span>Warranties</span>
         </div>
       </Link>
 
       <Link href="/dashboard/garantias/nuevas">
         <div className="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">
           <PlusCircle className="h-5 w-5 mr-3" />
-          <span>{t("pendingWarranties")}</span>
+          <span>Pending Warranties</span>
         </div>
       </Link>
 
       <Link href="/dashboard/garantias/historial">
         <div className="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">
           <History className="h-5 w-5 mr-3" />
-          <span>{t("history")}</span>
+          <span>History</span>
         </div>
       </Link>
     </>
   )
 }
-

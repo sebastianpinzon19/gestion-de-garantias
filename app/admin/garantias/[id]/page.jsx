@@ -9,11 +9,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useLanguage } from "@/context/language-context"
 import { useToast } from "@/components/ui/use-toast"
 
 export default function AdminWarrantyDetails({ params }) {
-  const { t } = useLanguage()
   const { toast } = useToast()
   const router = useRouter()
   const { id } = params
@@ -30,13 +28,13 @@ export default function AdminWarrantyDetails({ params }) {
         setLoading(true)
         // Fetch warranty details
         const warrantyRes = await fetch(`/api/warranties/${id}`)
-        if (!warrantyRes.ok) throw new Error("Error al cargar los datos de la garantía")
+        if (!warrantyRes.ok) throw new Error("Error loading warranty details")
         const warrantyData = await warrantyRes.json()
         setWarranty(warrantyData)
 
         // Fetch sellers
         const sellersRes = await fetch(`/api/users?role=seller`)
-        if (!sellersRes.ok) throw new Error("Error al cargar los vendedores")
+        if (!sellersRes.ok) throw new Error("Error loading sellers")
         const sellersData = await sellersRes.json()
         setSellers(sellersData)
 
@@ -59,7 +57,7 @@ export default function AdminWarrantyDetails({ params }) {
     if (!selectedSeller) {
       toast({
         title: "Error",
-        description: "Debe seleccionar un vendedor",
+        description: "You must select a seller",
         variant: "destructive",
       })
       return
@@ -77,17 +75,17 @@ export default function AdminWarrantyDetails({ params }) {
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.message || "Error al asignar la garantía")
+        throw new Error(errorData.message || "Error assigning warranty")
       }
 
       const data = await response.json()
 
-      // Actualizar la garantía en el estado
+      // Update warranty in state
       setWarranty(data.warranty)
 
       toast({
-        title: "Éxito",
-        description: "Garantía asignada correctamente",
+        title: "Success",
+        description: "Warranty assigned successfully",
       })
     } catch (error) {
       console.error("Error assigning warranty:", error)
@@ -105,7 +103,7 @@ export default function AdminWarrantyDetails({ params }) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
-        <p className="ml-3 text-gray-700 dark:text-gray-300">{t("loadingWarrantyDetails")}</p>
+        <p className="ml-3 text-gray-700 dark:text-gray-300">Loading Warranty Details</p>
       </div>
     )
   }
@@ -121,7 +119,7 @@ export default function AdminWarrantyDetails({ params }) {
   if (!warranty) {
     return (
       <Alert variant="destructive" className="mb-4">
-        <AlertDescription>Garantía no encontrada</AlertDescription>
+        <AlertDescription>Warranty Not Found</AlertDescription>
       </Alert>
     )
   }
@@ -131,19 +129,19 @@ export default function AdminWarrantyDetails({ params }) {
       case "pending":
         return (
           <Badge variant="outline" className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-            {t("pending")}
+            Pending
           </Badge>
         )
       case "approved":
         return (
           <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-            {t("approved")}
+            Approved
           </Badge>
         )
       case "rejected":
         return (
           <Badge variant="outline" className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
-            {t("rejected")}
+            Rejected
           </Badge>
         )
       default:
@@ -156,23 +154,23 @@ export default function AdminWarrantyDetails({ params }) {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            {t("warrantyDetails")} #{warranty.id}
+            Warranty Details #{warranty.id}
           </h1>
           <div className="flex items-center gap-2 mt-1">
-            <span className="text-gray-700 dark:text-gray-300">{t("status")}:</span>
+            <span className="text-gray-700 dark:text-gray-300">Status:</span>
             {getStatusBadge(warranty.status)}
           </div>
         </div>
         <Link href="/admin/garantias">
           <Button variant="outline" className="border-gray-300 dark:border-gray-600">
-            {t("back")}
+            Back
           </Button>
         </Link>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Asignar Garantía</CardTitle>
+          <CardTitle>Assign Warranty</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -180,7 +178,7 @@ export default function AdminWarrantyDetails({ params }) {
               <div className="flex-1">
                 <Select value={selectedSeller} onValueChange={setSelectedSeller}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar vendedor" />
+                    <SelectValue placeholder="Select Seller" />
                   </SelectTrigger>
                   <SelectContent>
                     {sellers.map((seller) => (
@@ -196,14 +194,14 @@ export default function AdminWarrantyDetails({ params }) {
                 disabled={assigning || !selectedSeller}
                 className="bg-purple-600 hover:bg-purple-700"
               >
-                {assigning ? "Asignando..." : "Asignar Vendedor"}
+                {assigning ? "Assigning..." : "Assign Seller"}
               </Button>
             </div>
 
             {warranty.assigned_to && (
               <Alert className="bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-800">
                 <AlertDescription className="text-green-800 dark:text-green-200">
-                  Esta garantía está asignada al vendedor ID: {warranty.assigned_to}
+                  This warranty is assigned to seller ID: {warranty.assigned_to}
                 </AlertDescription>
               </Alert>
             )}
@@ -213,32 +211,32 @@ export default function AdminWarrantyDetails({ params }) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Detalles de la Garantía</CardTitle>
+          <CardTitle>Warranty Details</CardTitle>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="customer">
             <TabsList>
-              <TabsTrigger value="customer">Información del Cliente</TabsTrigger>
-              <TabsTrigger value="product">Información del Producto</TabsTrigger>
-              <TabsTrigger value="damage">Información del Daño</TabsTrigger>
+              <TabsTrigger value="customer">Customer Information</TabsTrigger>
+              <TabsTrigger value="product">Product Information</TabsTrigger>
+              <TabsTrigger value="damage">Damage Information</TabsTrigger>
             </TabsList>
 
             <TabsContent value="customer" className="space-y-4 mt-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Nombre del Cliente</h3>
+                  <h3 className="text-sm font-medium text-gray-500">Customer Name</h3>
                   <p>{warranty.customer_name}</p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Teléfono</h3>
+                  <h3 className="text-sm font-medium text-gray-500">Phone</h3>
                   <p>{warranty.customer_phone}</p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Dirección</h3>
+                  <h3 className="text-sm font-medium text-gray-500">Address</h3>
                   <p>{warranty.address}</p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Fecha de Solicitud</h3>
+                  <h3 className="text-sm font-medium text-gray-500">Request Date</h3>
                   <p>{new Date(warranty.created_at).toLocaleDateString()}</p>
                 </div>
               </div>
@@ -247,11 +245,11 @@ export default function AdminWarrantyDetails({ params }) {
             <TabsContent value="product" className="space-y-4 mt-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Marca</h3>
+                  <h3 className="text-sm font-medium text-gray-500">Brand</h3>
                   <p>{warranty.brand}</p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Modelo</h3>
+                  <h3 className="text-sm font-medium text-gray-500">Model</h3>
                   <p>{warranty.model}</p>
                 </div>
                 <div>
@@ -259,11 +257,11 @@ export default function AdminWarrantyDetails({ params }) {
                   <p>{warranty.serial}</p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Fecha de Compra</h3>
+                  <h3 className="text-sm font-medium text-gray-500">Purchase Date</h3>
                   <p>{warranty.purchase_date}</p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Número de Factura</h3>
+                  <h3 className="text-sm font-medium text-gray-500">Invoice Number</h3>
                   <p>{warranty.invoice_number}</p>
                 </div>
               </div>
@@ -272,19 +270,19 @@ export default function AdminWarrantyDetails({ params }) {
             <TabsContent value="damage" className="space-y-4 mt-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Parte Dañada</h3>
+                  <h3 className="text-sm font-medium text-gray-500">Damaged Part</h3>
                   <p>{warranty.damaged_part}</p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Serial de Parte Dañada</h3>
+                  <h3 className="text-sm font-medium text-gray-500">Damaged Part Serial</h3>
                   <p>{warranty.damaged_part_serial || "N/A"}</p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Fecha del Daño</h3>
+                  <h3 className="text-sm font-medium text-gray-500">Damage Date</h3>
                   <p>{warranty.damage_date}</p>
                 </div>
                 <div className="col-span-2">
-                  <h3 className="text-sm font-medium text-gray-500">Descripción del Daño</h3>
+                  <h3 className="text-sm font-medium text-gray-500">Damage Description</h3>
                   <p className="whitespace-pre-wrap">{warranty.damage_description}</p>
                 </div>
               </div>
@@ -295,4 +293,3 @@ export default function AdminWarrantyDetails({ params }) {
     </div>
   )
 }
-

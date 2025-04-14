@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useLanguage } from "@/providers/language-provider"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -20,13 +19,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { PlusCircle, Search, Edit, Trash } from "lucide-react"
 
 export default function UsersPage() {
-  const { t } = useLanguage()
   const [users, setUsers] = useState([
     { id: 1, name: "Sebastian", email: "sebas@gmail.com", role: "admin" },
-    { id: 2, name: "Vendedor", email: "vendedor@gmail.com", role: "seller" },
-    { id: 3, name: "Ana Martínez", email: "ana@ejemplo.com", role: "seller" },
-    { id: 4, name: "Carlos López", email: "carlos@ejemplo.com", role: "seller" },
-    { id: 5, name: "María García", email: "maria@ejemplo.com", role: "seller" },
+    { id: 2, name: "Sales Representative", email: "sales@gmail.com", role: "seller" },
+    { id: 3, name: "Ana Martinez", email: "ana@example.com", role: "seller" },
+    { id: 4, name: "Carlos Lopez", email: "carlos@example.com", role: "seller" },
+    { id: 5, name: "Maria Garcia", email: "maria@example.com", role: "seller" },
   ])
   const [searchTerm, setSearchTerm] = useState("")
   const [loading, setLoading] = useState(false)
@@ -38,23 +36,6 @@ export default function UsersPage() {
     password: "",
     role: "seller",
   })
-
-  // En una implementación real, esto sería una llamada a la API
-  // useEffect(() => {
-  //   const fetchUsers = async () => {
-  //     setLoading(true)
-  //     try {
-  //       const response = await fetch("/api/users")
-  //       const data = await response.json()
-  //       setUsers(data)
-  //     } catch (error) {
-  //       console.error("Error fetching users:", error)
-  //     } finally {
-  //       setLoading(false)
-  //     }
-  //   }
-  //   fetchUsers()
-  // }, [])
 
   const filteredUsers = users.filter(
     (user) =>
@@ -76,7 +57,7 @@ export default function UsersPage() {
     e.preventDefault()
 
     if (editingUser) {
-      // Actualizar usuario existente
+      // Update existing user
       setUsers((prev) =>
         prev.map((user) =>
           user.id === editingUser.id
@@ -85,7 +66,7 @@ export default function UsersPage() {
         ),
       )
     } else {
-      // Crear nuevo usuario
+      // Create new user
       const newUser = {
         id: users.length + 1,
         name: formData.name,
@@ -111,7 +92,7 @@ export default function UsersPage() {
   }
 
   const handleDelete = (userId) => {
-    if (confirm(t("confirmDelete"))) {
+    if (confirm("Are you sure you want to delete this user?")) {
       setUsers((prev) => prev.filter((user) => user.id !== userId))
     }
   }
@@ -138,8 +119,8 @@ export default function UsersPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">{t("users")}</h2>
-          <p className="text-muted-foreground">{t("manageUsers")}</p>
+          <h2 className="text-3xl font-bold tracking-tight">Users</h2>
+          <p className="text-muted-foreground">Manage Users</p>
         </div>
         <Dialog
           open={openDialog}
@@ -151,19 +132,19 @@ export default function UsersPage() {
           <DialogTrigger asChild>
             <Button className="bg-blue-600 hover:bg-blue-700">
               <PlusCircle className="h-4 w-4 mr-2" />
-              {t("newUser")}
+              New User
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>{editingUser ? t("editUser") : t("newUser")}</DialogTitle>
-              <DialogDescription>{editingUser ? t("editUserDesc") : t("newUserDesc")}</DialogDescription>
+              <DialogTitle>{editingUser ? "Edit User" : "New User"}</DialogTitle>
+              <DialogDescription>{editingUser ? "Update user details" : "Create a new user"}</DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit}>
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="name" className="text-right">
-                    {t("name")}
+                    Name
                   </Label>
                   <Input
                     id="name"
@@ -176,7 +157,7 @@ export default function UsersPage() {
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="email" className="text-right">
-                    {t("email")}
+                    Email
                   </Label>
                   <Input
                     id="email"
@@ -191,7 +172,7 @@ export default function UsersPage() {
                 {!editingUser && (
                   <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="password" className="text-right">
-                      {t("password")}
+                      Password
                     </Label>
                     <Input
                       id="password"
@@ -200,28 +181,28 @@ export default function UsersPage() {
                       value={formData.password}
                       onChange={handleChange}
                       className="col-span-3"
-                      required={!editingUser}
+                      required
                     />
                   </div>
                 )}
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="role" className="text-right">
-                    {t("role")}
+                    Role
                   </Label>
                   <Select value={formData.role} onValueChange={handleRoleChange}>
                     <SelectTrigger className="col-span-3">
-                      <SelectValue placeholder={t("selectRole")} />
+                      <SelectValue placeholder="Select Role" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="admin">{t("admin")}</SelectItem>
-                      <SelectItem value="seller">{t("seller")}</SelectItem>
+                      <SelectItem value="seller">Seller</SelectItem>
+                      <SelectItem value="admin">Administrator</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
               <DialogFooter>
                 <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
-                  {editingUser ? t("saveChanges") : t("createUser")}
+                  {editingUser ? "Update User" : "Create User"}
                 </Button>
               </DialogFooter>
             </form>
@@ -231,26 +212,28 @@ export default function UsersPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>{t("usersList")}</CardTitle>
-          <CardDescription>{t("usersListDesc")}</CardDescription>
-          <div className="flex items-center mt-4">
-            <Search className="h-4 w-4 mr-2 text-muted-foreground" />
-            <Input
-              placeholder={t("searchUsers")}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="max-w-sm"
-            />
+          <CardTitle>Users List</CardTitle>
+          <CardDescription>List of all users in the system</CardDescription>
+          <div className="flex items-center gap-4 mt-4">
+            <div className="flex items-center flex-1">
+              <Search className="h-4 w-4 mr-2 text-muted-foreground" />
+              <Input
+                placeholder="Search users"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="max-w-sm"
+              />
+            </div>
           </div>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{t("name")}</TableHead>
-                <TableHead>{t("email")}</TableHead>
-                <TableHead>{t("role")}</TableHead>
-                <TableHead className="text-right">{t("actions")}</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -260,14 +243,8 @@ export default function UsersPage() {
                     <TableCell className="font-medium">{user.name}</TableCell>
                     <TableCell>{user.email}</TableCell>
                     <TableCell>
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs ${
-                          user.role === "admin"
-                            ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
-                            : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                        }`}
-                      >
-                        {user.role === "admin" ? t("admin") : t("seller")}
+                      <span className={user.role === "admin" ? "text-red-600" : "text-blue-600"}>
+                        {user.role === "admin" ? "Administrator" : "Seller"}
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
@@ -276,10 +253,10 @@ export default function UsersPage() {
                           <Edit className="h-4 w-4" />
                         </Button>
                         <Button
-                          variant="outline"
+                          variant="destructive"
                           size="icon"
-                          className="text-red-500 hover:text-red-600"
                           onClick={() => handleDelete(user.id)}
+                          disabled={user.role === "admin"}
                         >
                           <Trash className="h-4 w-4" />
                         </Button>
@@ -290,7 +267,7 @@ export default function UsersPage() {
               ) : (
                 <TableRow>
                   <TableCell colSpan={4} className="text-center py-6">
-                    {t("noUsersFound")}
+                    No users found
                   </TableCell>
                 </TableRow>
               )}
@@ -301,4 +278,3 @@ export default function UsersPage() {
     </div>
   )
 }
-

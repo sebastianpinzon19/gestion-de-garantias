@@ -8,10 +8,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { useLanguage } from "@/context/language-context"
 
 export default function Login() {
-  const { t } = useLanguage()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
@@ -19,7 +17,7 @@ export default function Login() {
   const [loginSuccess, setLoginSuccess] = useState(false)
   const router = useRouter()
 
-  // Verificar si ya hay una sesión activa
+  // Check if a session is already active
   useEffect(() => {
     if (typeof window !== "undefined") {
       const token = localStorage.getItem("token")
@@ -35,7 +33,7 @@ export default function Login() {
           }
         } catch (error) {
           console.error("Error parsing user data:", error)
-          // Limpiar datos inválidos
+          // Clear invalid data
           localStorage.removeItem("token")
           localStorage.removeItem("user")
         }
@@ -49,29 +47,29 @@ export default function Login() {
     setError("")
 
     try {
-      console.log("Intentando iniciar sesión con:", email, password)
+      console.log("Attempting to log in with:", email, password)
 
-      // Para propósitos de demostración, permitir acceso con credenciales específicas
+      // For demonstration purposes, allow access with specific credentials
       if (email === "admin@ejemplo.com" && password === "admin123") {
-        console.log("Credenciales de administrador correctas")
+        console.log("Admin credentials correct")
 
         const userData = {
           id: "1",
-          name: "Administrador",
+          name: "Administrator",
           email: "admin@ejemplo.com",
           role: "admin",
         }
 
-        // Guardar datos en localStorage
+        // Save data in localStorage
         localStorage.setItem("token", "demo-token-admin")
         localStorage.setItem("user", JSON.stringify(userData))
 
-        // Establecer cookie para el middleware
+        // Set cookie for middleware
         document.cookie = `token=demo-token-admin; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Strict`
 
         setLoginSuccess(true)
 
-        // Redireccionar después de un breve retraso
+        // Redirect after a brief delay
         setTimeout(() => {
           router.push("/admin/dashboard")
         }, 1000)
@@ -80,25 +78,25 @@ export default function Login() {
       }
 
       if (email === "vendedor@ejemplo.com" && password === "vendedor123") {
-        console.log("Credenciales de vendedor correctas")
+        console.log("Seller credentials correct")
 
         const userData = {
           id: "2",
-          name: "Vendedor Demo",
+          name: "Demo Seller",
           email: "vendedor@ejemplo.com",
           role: "seller",
         }
 
-        // Guardar datos en localStorage
+        // Save data in localStorage
         localStorage.setItem("token", "demo-token-seller")
         localStorage.setItem("user", JSON.stringify(userData))
 
-        // Establecer cookie para el middleware
+        // Set cookie for middleware
         document.cookie = `token=demo-token-seller; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Strict`
 
         setLoginSuccess(true)
 
-        // Redireccionar después de un breve retraso
+        // Redirect after a brief delay
         setTimeout(() => {
           router.push("/dashboard")
         }, 1000)
@@ -106,11 +104,11 @@ export default function Login() {
         return
       }
 
-      // Si las credenciales no coinciden con las predefinidas
-      setError(t("incorrectCredentials"))
+      // If credentials do not match predefined ones
+      setError("Incorrect credentials")
     } catch (err) {
       console.error("Error during login:", err)
-      setError(t("loginError"))
+      setError("Login error. Please try again.")
     } finally {
       setLoading(false)
     }
@@ -121,9 +119,11 @@ export default function Login() {
       <Card className="w-full max-w-md border-t-4 border-blue-500 shadow-lg">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center text-blue-800 dark:text-blue-300">
-            {t("login")}
+            Login
           </CardTitle>
-          <CardDescription className="text-center">{t("loginToSystem")}</CardDescription>
+          <CardDescription className="text-center">
+            Enter your credentials to access the system
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {error && (
@@ -135,18 +135,18 @@ export default function Login() {
           {loginSuccess && (
             <Alert className="mb-4 bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-800">
               <AlertDescription className="text-green-800 dark:text-green-200">
-                Inicio de sesión exitoso. Redirigiendo...
+                Login successful. Redirecting...
               </AlertDescription>
             </Alert>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">{t("email")}</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="correo@ejemplo.com"
+                placeholder="email@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -154,7 +154,7 @@ export default function Login() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">{t("password")}</Label>
+              <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
                 type="password"
@@ -169,18 +169,18 @@ export default function Login() {
               className="w-full bg-gradient-to-r from-blue-600 to-yellow-500 hover:from-blue-700 hover:to-yellow-600"
               disabled={loading}
             >
-              {loading ? t("loggingIn") : t("login")}
+              {loading ? "Logging in..." : "Login"}
             </Button>
           </form>
 
           <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/50 rounded-md border border-blue-100 dark:border-blue-800">
-            <p className="text-sm text-blue-800 dark:text-blue-300 font-medium mb-1">{t("demoCredentials")}</p>
+            <p className="text-sm text-blue-800 dark:text-blue-300 font-medium mb-1">Demo Credentials</p>
             <div className="text-xs text-gray-600 dark:text-gray-300 space-y-1">
               <p>
-                <strong>{t("admin")}:</strong> admin@ejemplo.com / admin123
+                <strong>Admin:</strong> admin@ejemplo.com / admin123
               </p>
               <p>
-                <strong>{t("seller")}:</strong> vendedor@ejemplo.com / vendedor123
+                <strong>Seller:</strong> vendedor@ejemplo.com / vendedor123
               </p>
             </div>
           </div>
@@ -191,7 +191,7 @@ export default function Login() {
               variant="ghost"
               className="text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/50"
             >
-              {t("back")}
+              Back
             </Button>
           </Link>
         </CardFooter>
@@ -199,4 +199,3 @@ export default function Login() {
     </div>
   )
 }
-
