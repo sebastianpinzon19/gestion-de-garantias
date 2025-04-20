@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { hash } from "bcrypt"
+import { hash } from "argon2"
 import { PrismaClient } from "@prisma/client"
 
 const prisma = new PrismaClient()
@@ -29,7 +29,7 @@ export async function POST(request) {
     }
 
     // Encriptar contraseña
-    const hashedPassword = await hash(password, 10)
+    const hashedPassword = await hash(password)
 
     // Crear usuario
     const user = await prisma.user.create({

@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server"
-import { PrismaClient } from "@prisma/client"
-
-const prisma = new PrismaClient()
+import prisma from "@/lib/prisma"
 
 export async function GET(request, { params }) {
   try {
@@ -9,7 +7,7 @@ export async function GET(request, { params }) {
 
     const warranty = await prisma.warranty.findUnique({
       where: {
-        id: parseInt(id),
+        id: id,
       },
     })
 
@@ -37,7 +35,7 @@ export async function PUT(request, { params }) {
 
     const warranty = await prisma.warranty.update({
       where: {
-        id: parseInt(id),
+        id: id,
       },
       data: {
         crediMemo: data.crediMemo,
@@ -48,7 +46,6 @@ export async function PUT(request, { params }) {
         warrantyStatus: data.warrantyStatus,
         technicianNotes: data.technicianNotes,
         resolutionDate: data.resolutionDate ? new Date(data.resolutionDate) : null,
-        updatedBy: data.updatedBy,
       },
     })
 
@@ -68,7 +65,7 @@ export async function DELETE(request, { params }) {
 
     await prisma.warranty.delete({
       where: {
-        id: parseInt(id),
+        id: id,
       },
     })
 

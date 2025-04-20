@@ -1,6 +1,7 @@
 import { sql } from "@/lib/db"
 import { NextResponse } from "next/server"
-import bcrypt from "bcryptjs"
+import { PrismaClient } from "@prisma/client"
+import * as argon2 from "argon2"
 
 export async function GET(request) {
   try {
@@ -49,7 +50,7 @@ export async function POST(request) {
     }
 
     // Encriptar contraseña
-    const hashedPassword = await bcrypt.hash(password, 10)
+    const hashedPassword = await argon2.hash(password)
 
     // Insertar usuario
     const result = await sql`

@@ -1,6 +1,6 @@
 import { sql } from "@/lib/db"
 import { NextResponse } from "next/server"
-import bcrypt from "bcryptjs"
+import * as argon2 from "argon2"
 
 export async function GET(request, { params }) {
   try {
@@ -69,7 +69,7 @@ export async function PUT(request, { params }) {
 
     // Si hay nueva contraseña, encriptarla
     if (data.password) {
-      const hashedPassword = await bcrypt.hash(data.password, 10)
+      const hashedPassword = await argon2.hash(data.password)
       updateQuery += `, password = $4`
       updateParams.push(hashedPassword)
     }

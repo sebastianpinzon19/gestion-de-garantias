@@ -3,3 +3,6 @@ ignoredBuiltDependencies:
   - '@prisma/engines'
   - bcrypt
   - prisma
+
+packages:
+  - "."
