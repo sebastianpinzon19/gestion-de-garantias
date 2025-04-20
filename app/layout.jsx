@@ -39,12 +39,16 @@ export default function RootLayout({ children }) {
         <link rel="apple-touch-icon" href="/apple-icon.png" />
       </head>
       <body className={inter.className}>
-        <AuthProvider>
-          <Providers>
-            {children}
-            <Toaster />
-          </Providers>
-        </AuthProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <AuthProvider>
+            <Providers>
+              <div id="root" suppressHydrationWarning>
+                {children}
+              </div>
+              <Toaster />
+            </Providers>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

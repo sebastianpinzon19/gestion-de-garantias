@@ -66,6 +66,24 @@ const nextConfig = {
         ]
       }
     ]
+  },
+
+  // Configuración de archivos estáticos
+  async rewrites() {
+    return [
+      {
+        source: '/favicon.ico',
+        destination: '/public/favicon.ico'
+      },
+      {
+        source: '/icon.png',
+        destination: '/public/icon.png'
+      },
+      {
+        source: '/apple-icon.png',
+        destination: '/public/apple-icon.png'
+      }
+    ]
   }
 };
 

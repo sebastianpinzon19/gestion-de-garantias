@@ -1,19 +1,51 @@
 import { NextResponse } from "next/server"
-import prisma from "@/lib/prisma"
+import { PrismaClient } from "@prisma/client"
 
-export async function GET() {
+let prisma;
+
+if (process.env.NODE_ENV === 'production') {
+  prisma = new PrismaClient();
+} else {
+  if (!global.prisma) {
+    global.prisma = new PrismaClient();
+  }
+  prisma = global.prisma;
+}
+
+export async function GET(request) {
   try {
+    const { searchParams } = new URL(request.url)
+    const status = searchParams.get("status")
+
+    const whereClause = status && status !== 'all' ? { status } : {}
+
     const warranties = await prisma.warranty.findMany({
+      where: whereClause,
+      include: {
+        assigned_to: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
       orderBy: {
-        createdAt: "desc",
+        created_at: 'desc'
       },
     })
 
-    return NextResponse.json(warranties)
+    return NextResponse.json({
+      success: true,
+      warranties: warranties || [],
+    })
   } catch (error) {
-    console.error("Error fetching warranties:", error)
+    console.error('Error en GET /api/warranties:', error)
     return NextResponse.json(
-      { message: "Error fetching warranties" },
+      {
+        success: false,
+        error: 'Error al obtener las garantías',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined,
+      },
       { status: 500 }
     )
   }
@@ -35,8 +67,7 @@ export async function POST(request) {
       "invoiceNumber",
       "damagedPart",
       "damageDate",
-      "damageDescription",
-      "customerSignature"
+      "damageDescription"
     ]
 
     const missingFields = requiredFields.filter(field => !data[field])
@@ -50,94 +81,44 @@ export async function POST(request) {
       )
     }
 
-    // Validar y formatear fechas
-    const formatDate = (dateString) => {
-      if (!dateString) return null;
-      try {
-        const date = new Date(dateString);
-        if (isNaN(date.getTime())) {
-          throw new Error("Fecha inválida");
-        }
-        return date;
-      } catch (error) {
-        console.error("Error al formatear fecha:", error);
-        throw new Error(`Fecha inválida: ${dateString}`);
-      }
-    };
-
-    // Validar fechas requeridas
-    try {
-      formatDate(data.purchaseDate);
-      formatDate(data.damageDate);
-    } catch (error) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          message: error.message 
-        },
-        { status: 400 }
-      );
-    }
-
-    // Verificar conexión a la base de datos
-    try {
-      await prisma.$connect();
-    } catch (error) {
-      console.error("Error de conexión a la base de datos:", error);
-      return NextResponse.json(
-        { 
-          success: false,
-          message: "Error de conexión a la base de datos",
-          error: error.message 
-        },
-        { status: 500 }
-      );
-    }
-
     // Crear la garantía
     const warranty = await prisma.warranty.create({
       data: {
-        customerName: data.customerName,
-        customerPhone: data.customerPhone,
-        ownerName: data.ownerName || null,
-        ownerPhone: data.ownerPhone || null,
+        customer_name: data.customerName,
+        customer_phone: data.customerPhone,
+        owner_name: data.ownerName || null,
+        owner_phone: data.ownerPhone || null,
         address: data.address,
         brand: data.brand,
         model: data.model,
         serial: data.serial,
-        purchaseDate: formatDate(data.purchaseDate),
-        invoiceNumber: data.invoiceNumber,
-        damagedPart: data.damagedPart,
-        damagedPartSerial: data.damagedPartSerial || null,
-        damageDate: formatDate(data.damageDate),
-        damageDescription: data.damageDescription,
-        customerSignature: data.customerSignature,
-        warrantyStatus: "pending",
-        
-        // Campos opcionales del vendedor
-        crediMemo: data.crediMemo || null,
-        replacementPart: data.replacementPart || null,
-        replacementSerial: data.replacementSerial || null,
-        sellerSignature: data.sellerSignature || null,
-        managementDate: data.managementDate ? formatDate(data.managementDate) : null,
-        technicianNotes: data.technicianNotes || null,
-        resolutionDate: data.resolutionDate ? formatDate(data.resolutionDate) : null,
+        purchase_date: new Date(data.purchaseDate),
+        invoice_number: data.invoiceNumber,
+        damaged_part: data.damagedPart,
+        damaged_part_serial: data.damagedPartSerial || null,
+        damage_date: new Date(data.damageDate),
+        damage_description: data.damageDescription,
+        status: "pending"
       }
     })
 
-    return NextResponse.json(warranty)
+    return NextResponse.json({ 
+      success: true, 
+      message: "Garantía creada exitosamente",
+      warranty 
+    })
   } catch (error) {
-    console.error("Error creating warranty:", error)
+    console.error("Error al crear garantía:", error)
     return NextResponse.json(
       { 
-        success: false,
+        success: false, 
         message: "Error al crear la garantía",
         error: error.message 
       },
       { status: 500 }
     )
   } finally {
-    await prisma.$disconnect();
+    await prisma.$disconnect()
   }
 }
 
