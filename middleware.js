@@ -7,25 +7,36 @@ export async function middleware(request) {
   const publicRoutes = [
     "/",
     "/login",
+    "/auth/login",
+    "/auth/register",
     "/garantia/nueva",
     "/garantia/solicitar",
     "/garantia/form",
     "/garantia/cliente",
-    "/warranty/new",         // Added explicit path
+    "/warranty/new",
     "/warranty/request",
     "/warranty-form",
-    "/warranty"             // Added base warranty path
+    "/warranty"
   ]
 
-  // Verificar si es una ruta pública o recurso estático
+  // Rutas de API que no requieren autenticación
+  const publicApiRoutes = [
+    "/api/auth/login",
+    "/api/auth/register",
+    "/api/warranties",
+    "/api/public"
+  ]
+
+  // Verificar si es una ruta pública, API pública o recurso estático
   if (
     publicRoutes.includes(pathname) ||
-    pathname.startsWith("/api/public/") ||
+    publicApiRoutes.some(route => pathname.startsWith(route)) ||
     pathname.startsWith("/garantia/") ||
-    pathname.startsWith("/warranty") ||    // Changed to catch all warranty routes
+    pathname.startsWith("/warranty/") ||
     pathname.includes("/_next/") ||
     pathname.includes("/favicon.ico") ||
-    pathname.includes("/images/")
+    pathname.includes("/images/") ||
+    pathname.includes("/api/auth/")
   ) {
     return NextResponse.next()
   }

@@ -5,7 +5,7 @@ const nextConfig = {
   
   env: {
     DATABASE_URL: process.env.VERCEL_DATABASE_URL || process.env.LOCAL_DATABASE_URL,
-    APP_TITLE: 'Warranties Management App'
+    APP_TITLE: 'Sistema de Gestión de Garantías'
   },
   
   webpack: (config) => {
@@ -17,7 +17,8 @@ const nextConfig = {
   },
   
   images: {
-    unoptimized: true
+    domains: ['localhost', 'vercel.app'],
+    unoptimized: process.env.NODE_ENV === 'development'
   },
   
   typescript: {
@@ -26,6 +27,45 @@ const nextConfig = {
   
   eslint: {
     ignoreDuringBuilds: true
+  },
+
+  // Optimizaciones para producción
+  experimental: {
+    optimizeFonts: true,
+    optimizeImages: true,
+    scrollRestoration: true,
+    legacyBrowsers: false,
+    browsersListForSwc: true
+  },
+
+  // Configuración de páginas
+  pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
+  
+  // Headers de seguridad
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-DNS-Prefetch-Control',
+            value: 'on'
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block'
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          }
+        ]
+      }
+    ]
   }
 };
 
