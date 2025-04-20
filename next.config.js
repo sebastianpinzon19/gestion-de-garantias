@@ -29,15 +29,6 @@ const nextConfig = {
     ignoreDuringBuilds: true
   },
 
-  // Optimizaciones para producción
-  experimental: {
-    optimizeFonts: true,
-    optimizeImages: true,
-    scrollRestoration: true,
-    legacyBrowsers: false,
-    browsersListForSwc: true
-  },
-
   // Configuración de páginas
   pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
   
