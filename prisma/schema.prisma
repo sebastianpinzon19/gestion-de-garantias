@@ -25,13 +25,33 @@ model User {
 }
 
 model Warranty {
-  id            String   @id @default(cuid())
-  customerId    String
-  customerName  String
-  productName   String
-  serialNumber  String
-  description   String
-  status        String   @default("pending")
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                String   @id @default(cuid())
+  customerName      String
+  customerPhone     String
+  ownerName        String?
+  ownerPhone       String?
+  address          String
+  brand            String
+  model            String
+  serial           String
+  purchaseDate     DateTime
+  invoiceNumber    String
+  damagedPart      String
+  damagedPartSerial String?
+  damageDate       DateTime
+  damageDescription String
+  customerSignature String
+  
+  // Seller section
+  crediMemo        String?
+  replacementPart  String?
+  replacementSerial String?
+  sellerSignature  String?
+  managementDate   DateTime?
+  warrantyStatus   String   @default("pending")
+  technicianNotes  String?
+  resolutionDate   DateTime?
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }

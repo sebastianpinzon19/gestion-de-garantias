@@ -1,18 +1,31 @@
 import { NextResponse } from "next/server"
 
 export async function middleware(request) {
-  // Obtener la ruta de la URL
   const { pathname } = request.nextUrl
 
   // Rutas públicas que no requieren autenticación
-  const publicRoutes = ["/", "/login", "/garantia/nueva"]
+  const publicRoutes = [
+    "/",
+    "/login",
+    "/garantia/nueva",
+    "/garantia/solicitar",
+    "/garantia/form",
+    "/garantia/cliente",
+    "/warranty/new",         // Added explicit path
+    "/warranty/request",
+    "/warranty-form",
+    "/warranty"             // Added base warranty path
+  ]
 
-  // Permitir rutas de API y rutas públicas
+  // Verificar si es una ruta pública o recurso estático
   if (
     publicRoutes.includes(pathname) ||
-    pathname.startsWith("/api/") ||
+    pathname.startsWith("/api/public/") ||
+    pathname.startsWith("/garantia/") ||
+    pathname.startsWith("/warranty") ||    // Changed to catch all warranty routes
     pathname.includes("/_next/") ||
-    pathname.includes("/favicon.ico")
+    pathname.includes("/favicon.ico") ||
+    pathname.includes("/images/")
   ) {
     return NextResponse.next()
   }
@@ -54,8 +67,8 @@ export async function middleware(request) {
   }
 }
 
-// Actualizar el matcher para excluir más archivos estáticos e incluir solo las rutas que queremos proteger
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|images|public|api/auth/login).*)"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|images|public|api/public|warranty|garantia).*)"],
 }
 

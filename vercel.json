@@ -15,7 +15,7 @@
   "env": {
     "PRISMA_GENERATE_SKIP_AUTOINSTALL": "true",
     "NODE_ENV": "production",
-    "NEXT_PUBLIC_SITE_URL": "https://gestion-de-garantias.vercel.app"
+    "NEXT_PUBLIC_SITE_URL": "https://warranty-management.vercel.app"
   },
   "buildCommand": "node scripts/vercel-build.js",
   "installCommand": "npm install -g pnpm && pnpm install",

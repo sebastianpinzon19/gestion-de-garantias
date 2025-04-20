@@ -1,9 +1,8 @@
-"use client"
+/*"use client"
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { useLanguage } from "@/context/language-context"
 import { useTheme } from "@/context/theme-context"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -15,15 +14,12 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import SignatureCanvas from "@/components/forms/signature-canvas"
 
 export default function NuevaGarantia() {
-  const { t, language } = useLanguage()
   const { theme } = useTheme()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("cliente")
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState("")
-
-  // First, add a state to track if the user is a seller
   const [isSeller, setIsSeller] = useState(false)
 
   // Estado para los datos del formulario
@@ -145,17 +141,19 @@ export default function NuevaGarantia() {
         <Card className="w-full max-w-md border-green-500 dark:border-green-700">
           <CardHeader>
             <CardTitle className="text-2xl font-bold text-center text-green-600 dark:text-green-400">
-              {t("requestSent")}
+              Solicitud Enviada
             </CardTitle>
-            <CardDescription className="text-center dark:text-gray-300">{t("requestSentDesc")}</CardDescription>
+            <CardDescription className="text-center dark:text-gray-300">
+              Su solicitud de garantía ha sido enviada exitosamente
+            </CardDescription>
           </CardHeader>
           <CardContent className="text-center dark:text-gray-300">
-            <p className="mb-4">{t("notificationMessage")}</p>
+            <p className="mb-4">Le notificaremos cuando haya actualizaciones</p>
           </CardContent>
           <CardFooter className="flex justify-center">
             <Link href="/">
               <Button className="bg-gradient-to-r from-blue-600 to-yellow-500 hover:from-blue-700 hover:to-yellow-600 text-white">
-                {t("returnHome")}
+                Volver al Inicio
               </Button>
             </Link>
           </CardFooter>
@@ -569,4 +567,3 @@ export default function NuevaGarantia() {
     </div>
   )
 }
-

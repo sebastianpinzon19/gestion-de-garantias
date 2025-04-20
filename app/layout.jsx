@@ -3,25 +3,26 @@ import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
 import { ThemeProvider } from "@/context/theme-context"
 import { AuthProvider } from "@/providers/auth-provider"
+import { Providers } from './providers'
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
-  title: "Warranty Management System | GarantíasApp",
+  title: "Warranty Management System | WarrantyApp",
   description: "Efficient digital platform for managing product warranties",
-  generator: 'v0.dev'
+  generator: 'REYES'
 }
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} transition-colors duration-200`}>
-        <ThemeProvider>
-          <AuthProvider>
+    <html lang="es" suppressHydrationWarning>
+      <body className={inter.className}>
+        <AuthProvider>
+          <Providers>
             {children}
             <Toaster />
-          </AuthProvider>
-        </ThemeProvider>
+          </Providers>
+        </AuthProvider>
       </body>
     </html>
   )

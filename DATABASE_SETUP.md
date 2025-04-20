@@ -11,7 +11,7 @@
 CREATE DATABASE warranty_system;
 
 -- Create user (if not exists)
-CREATE USER postgres WITH PASSWORD '1019983857';
+CREATE USER postgres WITH PASSWORD '1019983857.';
 
 -- Grant privileges
 GRANT ALL PRIVILEGES ON DATABASE warranty_system TO postgres;

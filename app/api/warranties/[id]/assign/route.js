@@ -13,19 +13,19 @@ export async function POST(request, { params }) {
     `
 
     if (existingWarranty.length === 0) {
-      return NextResponse.json({ success: false, message: "Garantía no encontrada" }, { status: 404 })
+      return NextResponse.json({ success: false, message: "Warranty not found" }, { status: 404 })
     }
 
-    // Verificar si el vendedor existe
+    // Check if seller exists
     const seller = await sql`
       SELECT * FROM users WHERE id = ${sellerId} AND role = 'seller'
     `
 
     if (seller.length === 0) {
-      return NextResponse.json({ success: false, message: "Vendedor no encontrado" }, { status: 404 })
+      return NextResponse.json({ success: false, message: "Seller not found" }, { status: 404 })
     }
 
-    // Actualizar la garantía con el vendedor asignado
+    // Update warranty with assigned seller
     const updatedWarranty = await sql`
       UPDATE warranties 
       SET assigned_to = ${sellerId}, updated_at = CURRENT_TIMESTAMP
@@ -33,12 +33,12 @@ export async function POST(request, { params }) {
       RETURNING *
     `
 
-    // Enviar notificación por correo al vendedor
+    // Send email notification to seller
     await sendSellerAssignmentNotification(updatedWarranty[0], seller[0])
 
     return NextResponse.json({
       success: true,
-      message: "Garantía asignada correctamente",
+      message: "Warranty assigned successfully",
       warranty: updatedWarranty[0],
     })
   } catch (error) {
@@ -46,7 +46,7 @@ export async function POST(request, { params }) {
     return NextResponse.json(
       {
         success: false,
-        message: "Error al asignar la garantía",
+        message: "Error assigning warranty",
       },
       { status: 500 },
     )

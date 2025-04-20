@@ -1,9 +1,10 @@
 /** @type {import('next').NextConfig} */
-module.exports = {
+export default {
   reactStrictMode: true,
   
   env: {
-    DATABASE_URL: process.env.VERCEL_DATABASE_URL || process.env.LOCAL_DATABASE_URL
+    DATABASE_URL: process.env.VERCEL_DATABASE_URL || process.env.LOCAL_DATABASE_URL,
+    APP_TITLE: 'Warranties Management App'
   },
   
   webpack: (config) => {
@@ -21,18 +22,5 @@ module.exports = {
   
   eslint: {
     ignoreDuringBuilds: true
-  },
-  
-  // Añadir más información de depuración
-  logging: {
-    level: 'verbose'
-  },
-  
-  // Configuración experimental para más información
-  experimental: {
-    serverActions: true,
-    logging: {
-      level: 'verbose'
-    }
   }
 };

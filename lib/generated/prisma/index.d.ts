@@ -1843,36 +1843,87 @@ export namespace Prisma {
 
   export type WarrantyMinAggregateOutputType = {
     id: string | null
-    customerId: string | null
     customerName: string | null
-    productName: string | null
-    serialNumber: string | null
-    description: string | null
-    status: string | null
+    customerPhone: string | null
+    ownerName: string | null
+    ownerPhone: string | null
+    address: string | null
+    brand: string | null
+    model: string | null
+    serial: string | null
+    purchaseDate: Date | null
+    invoiceNumber: string | null
+    damagedPart: string | null
+    damagedPartSerial: string | null
+    damageDate: Date | null
+    damageDescription: string | null
+    customerSignature: string | null
+    crediMemo: string | null
+    replacementPart: string | null
+    replacementSerial: string | null
+    sellerSignature: string | null
+    managementDate: Date | null
+    warrantyStatus: string | null
+    technicianNotes: string | null
+    resolutionDate: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
 
   export type WarrantyMaxAggregateOutputType = {
     id: string | null
-    customerId: string | null
     customerName: string | null
-    productName: string | null
-    serialNumber: string | null
-    description: string | null
-    status: string | null
+    customerPhone: string | null
+    ownerName: string | null
+    ownerPhone: string | null
+    address: string | null
+    brand: string | null
+    model: string | null
+    serial: string | null
+    purchaseDate: Date | null
+    invoiceNumber: string | null
+    damagedPart: string | null
+    damagedPartSerial: string | null
+    damageDate: Date | null
+    damageDescription: string | null
+    customerSignature: string | null
+    crediMemo: string | null
+    replacementPart: string | null
+    replacementSerial: string | null
+    sellerSignature: string | null
+    managementDate: Date | null
+    warrantyStatus: string | null
+    technicianNotes: string | null
+    resolutionDate: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
 
   export type WarrantyCountAggregateOutputType = {
     id: number
-    customerId: number
     customerName: number
-    productName: number
-    serialNumber: number
-    description: number
-    status: number
+    customerPhone: number
+    ownerName: number
+    ownerPhone: number
+    address: number
+    brand: number
+    model: number
+    serial: number
+    purchaseDate: number
+    invoiceNumber: number
+    damagedPart: number
+    damagedPartSerial: number
+    damageDate: number
+    damageDescription: number
+    customerSignature: number
+    crediMemo: number
+    replacementPart: number
+    replacementSerial: number
+    sellerSignature: number
+    managementDate: number
+    warrantyStatus: number
+    technicianNotes: number
+    resolutionDate: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -1881,36 +1932,87 @@ export namespace Prisma {
 
   export type WarrantyMinAggregateInputType = {
     id?: true
-    customerId?: true
     customerName?: true
-    productName?: true
-    serialNumber?: true
-    description?: true
-    status?: true
+    customerPhone?: true
+    ownerName?: true
+    ownerPhone?: true
+    address?: true
+    brand?: true
+    model?: true
+    serial?: true
+    purchaseDate?: true
+    invoiceNumber?: true
+    damagedPart?: true
+    damagedPartSerial?: true
+    damageDate?: true
+    damageDescription?: true
+    customerSignature?: true
+    crediMemo?: true
+    replacementPart?: true
+    replacementSerial?: true
+    sellerSignature?: true
+    managementDate?: true
+    warrantyStatus?: true
+    technicianNotes?: true
+    resolutionDate?: true
     createdAt?: true
     updatedAt?: true
   }
 
   export type WarrantyMaxAggregateInputType = {
     id?: true
-    customerId?: true
     customerName?: true
-    productName?: true
-    serialNumber?: true
-    description?: true
-    status?: true
+    customerPhone?: true
+    ownerName?: true
+    ownerPhone?: true
+    address?: true
+    brand?: true
+    model?: true
+    serial?: true
+    purchaseDate?: true
+    invoiceNumber?: true
+    damagedPart?: true
+    damagedPartSerial?: true
+    damageDate?: true
+    damageDescription?: true
+    customerSignature?: true
+    crediMemo?: true
+    replacementPart?: true
+    replacementSerial?: true
+    sellerSignature?: true
+    managementDate?: true
+    warrantyStatus?: true
+    technicianNotes?: true
+    resolutionDate?: true
     createdAt?: true
     updatedAt?: true
   }
 
   export type WarrantyCountAggregateInputType = {
     id?: true
-    customerId?: true
     customerName?: true
-    productName?: true
-    serialNumber?: true
-    description?: true
-    status?: true
+    customerPhone?: true
+    ownerName?: true
+    ownerPhone?: true
+    address?: true
+    brand?: true
+    model?: true
+    serial?: true
+    purchaseDate?: true
+    invoiceNumber?: true
+    damagedPart?: true
+    damagedPartSerial?: true
+    damageDate?: true
+    damageDescription?: true
+    customerSignature?: true
+    crediMemo?: true
+    replacementPart?: true
+    replacementSerial?: true
+    sellerSignature?: true
+    managementDate?: true
+    warrantyStatus?: true
+    technicianNotes?: true
+    resolutionDate?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -1990,12 +2092,29 @@ export namespace Prisma {
 
   export type WarrantyGroupByOutputType = {
     id: string
-    customerId: string
     customerName: string
-    productName: string
-    serialNumber: string
-    description: string
-    status: string
+    customerPhone: string
+    ownerName: string | null
+    ownerPhone: string | null
+    address: string
+    brand: string
+    model: string
+    serial: string
+    purchaseDate: Date
+    invoiceNumber: string
+    damagedPart: string
+    damagedPartSerial: string | null
+    damageDate: Date
+    damageDescription: string
+    customerSignature: string
+    crediMemo: string | null
+    replacementPart: string | null
+    replacementSerial: string | null
+    sellerSignature: string | null
+    managementDate: Date | null
+    warrantyStatus: string
+    technicianNotes: string | null
+    resolutionDate: Date | null
     createdAt: Date
     updatedAt: Date
     _count: WarrantyCountAggregateOutputType | null
@@ -2019,36 +2138,87 @@ export namespace Prisma {
 
   export type WarrantySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    customerId?: boolean
     customerName?: boolean
-    productName?: boolean
-    serialNumber?: boolean
-    description?: boolean
-    status?: boolean
+    customerPhone?: boolean
+    ownerName?: boolean
+    ownerPhone?: boolean
+    address?: boolean
+    brand?: boolean
+    model?: boolean
+    serial?: boolean
+    purchaseDate?: boolean
+    invoiceNumber?: boolean
+    damagedPart?: boolean
+    damagedPartSerial?: boolean
+    damageDate?: boolean
+    damageDescription?: boolean
+    customerSignature?: boolean
+    crediMemo?: boolean
+    replacementPart?: boolean
+    replacementSerial?: boolean
+    sellerSignature?: boolean
+    managementDate?: boolean
+    warrantyStatus?: boolean
+    technicianNotes?: boolean
+    resolutionDate?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["warranty"]>
 
   export type WarrantySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    customerId?: boolean
     customerName?: boolean
-    productName?: boolean
-    serialNumber?: boolean
-    description?: boolean
-    status?: boolean
+    customerPhone?: boolean
+    ownerName?: boolean
+    ownerPhone?: boolean
+    address?: boolean
+    brand?: boolean
+    model?: boolean
+    serial?: boolean
+    purchaseDate?: boolean
+    invoiceNumber?: boolean
+    damagedPart?: boolean
+    damagedPartSerial?: boolean
+    damageDate?: boolean
+    damageDescription?: boolean
+    customerSignature?: boolean
+    crediMemo?: boolean
+    replacementPart?: boolean
+    replacementSerial?: boolean
+    sellerSignature?: boolean
+    managementDate?: boolean
+    warrantyStatus?: boolean
+    technicianNotes?: boolean
+    resolutionDate?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["warranty"]>
 
   export type WarrantySelectScalar = {
     id?: boolean
-    customerId?: boolean
     customerName?: boolean
-    productName?: boolean
-    serialNumber?: boolean
-    description?: boolean
-    status?: boolean
+    customerPhone?: boolean
+    ownerName?: boolean
+    ownerPhone?: boolean
+    address?: boolean
+    brand?: boolean
+    model?: boolean
+    serial?: boolean
+    purchaseDate?: boolean
+    invoiceNumber?: boolean
+    damagedPart?: boolean
+    damagedPartSerial?: boolean
+    damageDate?: boolean
+    damageDescription?: boolean
+    customerSignature?: boolean
+    crediMemo?: boolean
+    replacementPart?: boolean
+    replacementSerial?: boolean
+    sellerSignature?: boolean
+    managementDate?: boolean
+    warrantyStatus?: boolean
+    technicianNotes?: boolean
+    resolutionDate?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
@@ -2059,12 +2229,29 @@ export namespace Prisma {
     objects: {}
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      customerId: string
       customerName: string
-      productName: string
-      serialNumber: string
-      description: string
-      status: string
+      customerPhone: string
+      ownerName: string | null
+      ownerPhone: string | null
+      address: string
+      brand: string
+      model: string
+      serial: string
+      purchaseDate: Date
+      invoiceNumber: string
+      damagedPart: string
+      damagedPartSerial: string | null
+      damageDate: Date
+      damageDescription: string
+      customerSignature: string
+      crediMemo: string | null
+      replacementPart: string | null
+      replacementSerial: string | null
+      sellerSignature: string | null
+      managementDate: Date | null
+      warrantyStatus: string
+      technicianNotes: string | null
+      resolutionDate: Date | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["warranty"]>
@@ -2461,12 +2648,29 @@ export namespace Prisma {
    */ 
   interface WarrantyFieldRefs {
     readonly id: FieldRef<"Warranty", 'String'>
-    readonly customerId: FieldRef<"Warranty", 'String'>
     readonly customerName: FieldRef<"Warranty", 'String'>
-    readonly productName: FieldRef<"Warranty", 'String'>
-    readonly serialNumber: FieldRef<"Warranty", 'String'>
-    readonly description: FieldRef<"Warranty", 'String'>
-    readonly status: FieldRef<"Warranty", 'String'>
+    readonly customerPhone: FieldRef<"Warranty", 'String'>
+    readonly ownerName: FieldRef<"Warranty", 'String'>
+    readonly ownerPhone: FieldRef<"Warranty", 'String'>
+    readonly address: FieldRef<"Warranty", 'String'>
+    readonly brand: FieldRef<"Warranty", 'String'>
+    readonly model: FieldRef<"Warranty", 'String'>
+    readonly serial: FieldRef<"Warranty", 'String'>
+    readonly purchaseDate: FieldRef<"Warranty", 'DateTime'>
+    readonly invoiceNumber: FieldRef<"Warranty", 'String'>
+    readonly damagedPart: FieldRef<"Warranty", 'String'>
+    readonly damagedPartSerial: FieldRef<"Warranty", 'String'>
+    readonly damageDate: FieldRef<"Warranty", 'DateTime'>
+    readonly damageDescription: FieldRef<"Warranty", 'String'>
+    readonly customerSignature: FieldRef<"Warranty", 'String'>
+    readonly crediMemo: FieldRef<"Warranty", 'String'>
+    readonly replacementPart: FieldRef<"Warranty", 'String'>
+    readonly replacementSerial: FieldRef<"Warranty", 'String'>
+    readonly sellerSignature: FieldRef<"Warranty", 'String'>
+    readonly managementDate: FieldRef<"Warranty", 'DateTime'>
+    readonly warrantyStatus: FieldRef<"Warranty", 'String'>
+    readonly technicianNotes: FieldRef<"Warranty", 'String'>
+    readonly resolutionDate: FieldRef<"Warranty", 'DateTime'>
     readonly createdAt: FieldRef<"Warranty", 'DateTime'>
     readonly updatedAt: FieldRef<"Warranty", 'DateTime'>
   }
@@ -2786,12 +2990,29 @@ export namespace Prisma {
 
   export const WarrantyScalarFieldEnum: {
     id: 'id',
-    customerId: 'customerId',
     customerName: 'customerName',
-    productName: 'productName',
-    serialNumber: 'serialNumber',
-    description: 'description',
-    status: 'status',
+    customerPhone: 'customerPhone',
+    ownerName: 'ownerName',
+    ownerPhone: 'ownerPhone',
+    address: 'address',
+    brand: 'brand',
+    model: 'model',
+    serial: 'serial',
+    purchaseDate: 'purchaseDate',
+    invoiceNumber: 'invoiceNumber',
+    damagedPart: 'damagedPart',
+    damagedPartSerial: 'damagedPartSerial',
+    damageDate: 'damageDate',
+    damageDescription: 'damageDescription',
+    customerSignature: 'customerSignature',
+    crediMemo: 'crediMemo',
+    replacementPart: 'replacementPart',
+    replacementSerial: 'replacementSerial',
+    sellerSignature: 'sellerSignature',
+    managementDate: 'managementDate',
+    warrantyStatus: 'warrantyStatus',
+    technicianNotes: 'technicianNotes',
+    resolutionDate: 'resolutionDate',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -2813,6 +3034,14 @@ export namespace Prisma {
   };
 
   export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+  export const NullsOrder: {
+    first: 'first',
+    last: 'last'
+  };
+
+  export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
   /**
@@ -2932,24 +3161,58 @@ export namespace Prisma {
     OR?: WarrantyWhereInput[]
     NOT?: WarrantyWhereInput | WarrantyWhereInput[]
     id?: StringFilter<"Warranty"> | string
-    customerId?: StringFilter<"Warranty"> | string
     customerName?: StringFilter<"Warranty"> | string
-    productName?: StringFilter<"Warranty"> | string
-    serialNumber?: StringFilter<"Warranty"> | string
-    description?: StringFilter<"Warranty"> | string
-    status?: StringFilter<"Warranty"> | string
+    customerPhone?: StringFilter<"Warranty"> | string
+    ownerName?: StringNullableFilter<"Warranty"> | string | null
+    ownerPhone?: StringNullableFilter<"Warranty"> | string | null
+    address?: StringFilter<"Warranty"> | string
+    brand?: StringFilter<"Warranty"> | string
+    model?: StringFilter<"Warranty"> | string
+    serial?: StringFilter<"Warranty"> | string
+    purchaseDate?: DateTimeFilter<"Warranty"> | Date | string
+    invoiceNumber?: StringFilter<"Warranty"> | string
+    damagedPart?: StringFilter<"Warranty"> | string
+    damagedPartSerial?: StringNullableFilter<"Warranty"> | string | null
+    damageDate?: DateTimeFilter<"Warranty"> | Date | string
+    damageDescription?: StringFilter<"Warranty"> | string
+    customerSignature?: StringFilter<"Warranty"> | string
+    crediMemo?: StringNullableFilter<"Warranty"> | string | null
+    replacementPart?: StringNullableFilter<"Warranty"> | string | null
+    replacementSerial?: StringNullableFilter<"Warranty"> | string | null
+    sellerSignature?: StringNullableFilter<"Warranty"> | string | null
+    managementDate?: DateTimeNullableFilter<"Warranty"> | Date | string | null
+    warrantyStatus?: StringFilter<"Warranty"> | string
+    technicianNotes?: StringNullableFilter<"Warranty"> | string | null
+    resolutionDate?: DateTimeNullableFilter<"Warranty"> | Date | string | null
     createdAt?: DateTimeFilter<"Warranty"> | Date | string
     updatedAt?: DateTimeFilter<"Warranty"> | Date | string
   }
 
   export type WarrantyOrderByWithRelationInput = {
     id?: SortOrder
-    customerId?: SortOrder
     customerName?: SortOrder
-    productName?: SortOrder
-    serialNumber?: SortOrder
-    description?: SortOrder
-    status?: SortOrder
+    customerPhone?: SortOrder
+    ownerName?: SortOrderInput | SortOrder
+    ownerPhone?: SortOrderInput | SortOrder
+    address?: SortOrder
+    brand?: SortOrder
+    model?: SortOrder
+    serial?: SortOrder
+    purchaseDate?: SortOrder
+    invoiceNumber?: SortOrder
+    damagedPart?: SortOrder
+    damagedPartSerial?: SortOrderInput | SortOrder
+    damageDate?: SortOrder
+    damageDescription?: SortOrder
+    customerSignature?: SortOrder
+    crediMemo?: SortOrderInput | SortOrder
+    replacementPart?: SortOrderInput | SortOrder
+    replacementSerial?: SortOrderInput | SortOrder
+    sellerSignature?: SortOrderInput | SortOrder
+    managementDate?: SortOrderInput | SortOrder
+    warrantyStatus?: SortOrder
+    technicianNotes?: SortOrderInput | SortOrder
+    resolutionDate?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -2959,24 +3222,58 @@ export namespace Prisma {
     AND?: WarrantyWhereInput | WarrantyWhereInput[]
     OR?: WarrantyWhereInput[]
     NOT?: WarrantyWhereInput | WarrantyWhereInput[]
-    customerId?: StringFilter<"Warranty"> | string
     customerName?: StringFilter<"Warranty"> | string
-    productName?: StringFilter<"Warranty"> | string
-    serialNumber?: StringFilter<"Warranty"> | string
-    description?: StringFilter<"Warranty"> | string
-    status?: StringFilter<"Warranty"> | string
+    customerPhone?: StringFilter<"Warranty"> | string
+    ownerName?: StringNullableFilter<"Warranty"> | string | null
+    ownerPhone?: StringNullableFilter<"Warranty"> | string | null
+    address?: StringFilter<"Warranty"> | string
+    brand?: StringFilter<"Warranty"> | string
+    model?: StringFilter<"Warranty"> | string
+    serial?: StringFilter<"Warranty"> | string
+    purchaseDate?: DateTimeFilter<"Warranty"> | Date | string
+    invoiceNumber?: StringFilter<"Warranty"> | string
+    damagedPart?: StringFilter<"Warranty"> | string
+    damagedPartSerial?: StringNullableFilter<"Warranty"> | string | null
+    damageDate?: DateTimeFilter<"Warranty"> | Date | string
+    damageDescription?: StringFilter<"Warranty"> | string
+    customerSignature?: StringFilter<"Warranty"> | string
+    crediMemo?: StringNullableFilter<"Warranty"> | string | null
+    replacementPart?: StringNullableFilter<"Warranty"> | string | null
+    replacementSerial?: StringNullableFilter<"Warranty"> | string | null
+    sellerSignature?: StringNullableFilter<"Warranty"> | string | null
+    managementDate?: DateTimeNullableFilter<"Warranty"> | Date | string | null
+    warrantyStatus?: StringFilter<"Warranty"> | string
+    technicianNotes?: StringNullableFilter<"Warranty"> | string | null
+    resolutionDate?: DateTimeNullableFilter<"Warranty"> | Date | string | null
     createdAt?: DateTimeFilter<"Warranty"> | Date | string
     updatedAt?: DateTimeFilter<"Warranty"> | Date | string
   }, "id">
 
   export type WarrantyOrderByWithAggregationInput = {
     id?: SortOrder
-    customerId?: SortOrder
     customerName?: SortOrder
-    productName?: SortOrder
-    serialNumber?: SortOrder
-    description?: SortOrder
-    status?: SortOrder
+    customerPhone?: SortOrder
+    ownerName?: SortOrderInput | SortOrder
+    ownerPhone?: SortOrderInput | SortOrder
+    address?: SortOrder
+    brand?: SortOrder
+    model?: SortOrder
+    serial?: SortOrder
+    purchaseDate?: SortOrder
+    invoiceNumber?: SortOrder
+    damagedPart?: SortOrder
+    damagedPartSerial?: SortOrderInput | SortOrder
+    damageDate?: SortOrder
+    damageDescription?: SortOrder
+    customerSignature?: SortOrder
+    crediMemo?: SortOrderInput | SortOrder
+    replacementPart?: SortOrderInput | SortOrder
+    replacementSerial?: SortOrderInput | SortOrder
+    sellerSignature?: SortOrderInput | SortOrder
+    managementDate?: SortOrderInput | SortOrder
+    warrantyStatus?: SortOrder
+    technicianNotes?: SortOrderInput | SortOrder
+    resolutionDate?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: WarrantyCountOrderByAggregateInput
@@ -2989,12 +3286,29 @@ export namespace Prisma {
     OR?: WarrantyScalarWhereWithAggregatesInput[]
     NOT?: WarrantyScalarWhereWithAggregatesInput | WarrantyScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Warranty"> | string
-    customerId?: StringWithAggregatesFilter<"Warranty"> | string
     customerName?: StringWithAggregatesFilter<"Warranty"> | string
-    productName?: StringWithAggregatesFilter<"Warranty"> | string
-    serialNumber?: StringWithAggregatesFilter<"Warranty"> | string
-    description?: StringWithAggregatesFilter<"Warranty"> | string
-    status?: StringWithAggregatesFilter<"Warranty"> | string
+    customerPhone?: StringWithAggregatesFilter<"Warranty"> | string
+    ownerName?: StringNullableWithAggregatesFilter<"Warranty"> | string | null
+    ownerPhone?: StringNullableWithAggregatesFilter<"Warranty"> | string | null
+    address?: StringWithAggregatesFilter<"Warranty"> | string
+    brand?: StringWithAggregatesFilter<"Warranty"> | string
+    model?: StringWithAggregatesFilter<"Warranty"> | string
+    serial?: StringWithAggregatesFilter<"Warranty"> | string
+    purchaseDate?: DateTimeWithAggregatesFilter<"Warranty"> | Date | string
+    invoiceNumber?: StringWithAggregatesFilter<"Warranty"> | string
+    damagedPart?: StringWithAggregatesFilter<"Warranty"> | string
+    damagedPartSerial?: StringNullableWithAggregatesFilter<"Warranty"> | string | null
+    damageDate?: DateTimeWithAggregatesFilter<"Warranty"> | Date | string
+    damageDescription?: StringWithAggregatesFilter<"Warranty"> | string
+    customerSignature?: StringWithAggregatesFilter<"Warranty"> | string
+    crediMemo?: StringNullableWithAggregatesFilter<"Warranty"> | string | null
+    replacementPart?: StringNullableWithAggregatesFilter<"Warranty"> | string | null
+    replacementSerial?: StringNullableWithAggregatesFilter<"Warranty"> | string | null
+    sellerSignature?: StringNullableWithAggregatesFilter<"Warranty"> | string | null
+    managementDate?: DateTimeNullableWithAggregatesFilter<"Warranty"> | Date | string | null
+    warrantyStatus?: StringWithAggregatesFilter<"Warranty"> | string
+    technicianNotes?: StringNullableWithAggregatesFilter<"Warranty"> | string | null
+    resolutionDate?: DateTimeNullableWithAggregatesFilter<"Warranty"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Warranty"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Warranty"> | Date | string
   }
@@ -3071,84 +3385,203 @@ export namespace Prisma {
 
   export type WarrantyCreateInput = {
     id?: string
-    customerId: string
     customerName: string
-    productName: string
-    serialNumber: string
-    description: string
-    status?: string
+    customerPhone: string
+    ownerName?: string | null
+    ownerPhone?: string | null
+    address: string
+    brand: string
+    model: string
+    serial: string
+    purchaseDate: Date | string
+    invoiceNumber: string
+    damagedPart: string
+    damagedPartSerial?: string | null
+    damageDate: Date | string
+    damageDescription: string
+    customerSignature: string
+    crediMemo?: string | null
+    replacementPart?: string | null
+    replacementSerial?: string | null
+    sellerSignature?: string | null
+    managementDate?: Date | string | null
+    warrantyStatus?: string
+    technicianNotes?: string | null
+    resolutionDate?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
   export type WarrantyUncheckedCreateInput = {
     id?: string
-    customerId: string
     customerName: string
-    productName: string
-    serialNumber: string
-    description: string
-    status?: string
+    customerPhone: string
+    ownerName?: string | null
+    ownerPhone?: string | null
+    address: string
+    brand: string
+    model: string
+    serial: string
+    purchaseDate: Date | string
+    invoiceNumber: string
+    damagedPart: string
+    damagedPartSerial?: string | null
+    damageDate: Date | string
+    damageDescription: string
+    customerSignature: string
+    crediMemo?: string | null
+    replacementPart?: string | null
+    replacementSerial?: string | null
+    sellerSignature?: string | null
+    managementDate?: Date | string | null
+    warrantyStatus?: string
+    technicianNotes?: string | null
+    resolutionDate?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
   export type WarrantyUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    customerId?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
-    productName?: StringFieldUpdateOperationsInput | string
-    serialNumber?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
-    status?: StringFieldUpdateOperationsInput | string
+    customerPhone?: StringFieldUpdateOperationsInput | string
+    ownerName?: NullableStringFieldUpdateOperationsInput | string | null
+    ownerPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: StringFieldUpdateOperationsInput | string
+    brand?: StringFieldUpdateOperationsInput | string
+    model?: StringFieldUpdateOperationsInput | string
+    serial?: StringFieldUpdateOperationsInput | string
+    purchaseDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    invoiceNumber?: StringFieldUpdateOperationsInput | string
+    damagedPart?: StringFieldUpdateOperationsInput | string
+    damagedPartSerial?: NullableStringFieldUpdateOperationsInput | string | null
+    damageDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    damageDescription?: StringFieldUpdateOperationsInput | string
+    customerSignature?: StringFieldUpdateOperationsInput | string
+    crediMemo?: NullableStringFieldUpdateOperationsInput | string | null
+    replacementPart?: NullableStringFieldUpdateOperationsInput | string | null
+    replacementSerial?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerSignature?: NullableStringFieldUpdateOperationsInput | string | null
+    managementDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    warrantyStatus?: StringFieldUpdateOperationsInput | string
+    technicianNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    resolutionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type WarrantyUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    customerId?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
-    productName?: StringFieldUpdateOperationsInput | string
-    serialNumber?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
-    status?: StringFieldUpdateOperationsInput | string
+    customerPhone?: StringFieldUpdateOperationsInput | string
+    ownerName?: NullableStringFieldUpdateOperationsInput | string | null
+    ownerPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: StringFieldUpdateOperationsInput | string
+    brand?: StringFieldUpdateOperationsInput | string
+    model?: StringFieldUpdateOperationsInput | string
+    serial?: StringFieldUpdateOperationsInput | string
+    purchaseDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    invoiceNumber?: StringFieldUpdateOperationsInput | string
+    damagedPart?: StringFieldUpdateOperationsInput | string
+    damagedPartSerial?: NullableStringFieldUpdateOperationsInput | string | null
+    damageDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    damageDescription?: StringFieldUpdateOperationsInput | string
+    customerSignature?: StringFieldUpdateOperationsInput | string
+    crediMemo?: NullableStringFieldUpdateOperationsInput | string | null
+    replacementPart?: NullableStringFieldUpdateOperationsInput | string | null
+    replacementSerial?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerSignature?: NullableStringFieldUpdateOperationsInput | string | null
+    managementDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    warrantyStatus?: StringFieldUpdateOperationsInput | string
+    technicianNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    resolutionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type WarrantyCreateManyInput = {
     id?: string
-    customerId: string
     customerName: string
-    productName: string
-    serialNumber: string
-    description: string
-    status?: string
+    customerPhone: string
+    ownerName?: string | null
+    ownerPhone?: string | null
+    address: string
+    brand: string
+    model: string
+    serial: string
+    purchaseDate: Date | string
+    invoiceNumber: string
+    damagedPart: string
+    damagedPartSerial?: string | null
+    damageDate: Date | string
+    damageDescription: string
+    customerSignature: string
+    crediMemo?: string | null
+    replacementPart?: string | null
+    replacementSerial?: string | null
+    sellerSignature?: string | null
+    managementDate?: Date | string | null
+    warrantyStatus?: string
+    technicianNotes?: string | null
+    resolutionDate?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
   export type WarrantyUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    customerId?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
-    productName?: StringFieldUpdateOperationsInput | string
-    serialNumber?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
-    status?: StringFieldUpdateOperationsInput | string
+    customerPhone?: StringFieldUpdateOperationsInput | string
+    ownerName?: NullableStringFieldUpdateOperationsInput | string | null
+    ownerPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: StringFieldUpdateOperationsInput | string
+    brand?: StringFieldUpdateOperationsInput | string
+    model?: StringFieldUpdateOperationsInput | string
+    serial?: StringFieldUpdateOperationsInput | string
+    purchaseDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    invoiceNumber?: StringFieldUpdateOperationsInput | string
+    damagedPart?: StringFieldUpdateOperationsInput | string
+    damagedPartSerial?: NullableStringFieldUpdateOperationsInput | string | null
+    damageDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    damageDescription?: StringFieldUpdateOperationsInput | string
+    customerSignature?: StringFieldUpdateOperationsInput | string
+    crediMemo?: NullableStringFieldUpdateOperationsInput | string | null
+    replacementPart?: NullableStringFieldUpdateOperationsInput | string | null
+    replacementSerial?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerSignature?: NullableStringFieldUpdateOperationsInput | string | null
+    managementDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    warrantyStatus?: StringFieldUpdateOperationsInput | string
+    technicianNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    resolutionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type WarrantyUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    customerId?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
-    productName?: StringFieldUpdateOperationsInput | string
-    serialNumber?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
-    status?: StringFieldUpdateOperationsInput | string
+    customerPhone?: StringFieldUpdateOperationsInput | string
+    ownerName?: NullableStringFieldUpdateOperationsInput | string | null
+    ownerPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: StringFieldUpdateOperationsInput | string
+    brand?: StringFieldUpdateOperationsInput | string
+    model?: StringFieldUpdateOperationsInput | string
+    serial?: StringFieldUpdateOperationsInput | string
+    purchaseDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    invoiceNumber?: StringFieldUpdateOperationsInput | string
+    damagedPart?: StringFieldUpdateOperationsInput | string
+    damagedPartSerial?: NullableStringFieldUpdateOperationsInput | string | null
+    damageDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    damageDescription?: StringFieldUpdateOperationsInput | string
+    customerSignature?: StringFieldUpdateOperationsInput | string
+    crediMemo?: NullableStringFieldUpdateOperationsInput | string | null
+    replacementPart?: NullableStringFieldUpdateOperationsInput | string | null
+    replacementSerial?: NullableStringFieldUpdateOperationsInput | string | null
+    sellerSignature?: NullableStringFieldUpdateOperationsInput | string | null
+    managementDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    warrantyStatus?: StringFieldUpdateOperationsInput | string
+    technicianNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    resolutionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -3241,40 +3674,154 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type StringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
+  }
+
   export type WarrantyCountOrderByAggregateInput = {
     id?: SortOrder
-    customerId?: SortOrder
     customerName?: SortOrder
-    productName?: SortOrder
-    serialNumber?: SortOrder
-    description?: SortOrder
-    status?: SortOrder
+    customerPhone?: SortOrder
+    ownerName?: SortOrder
+    ownerPhone?: SortOrder
+    address?: SortOrder
+    brand?: SortOrder
+    model?: SortOrder
+    serial?: SortOrder
+    purchaseDate?: SortOrder
+    invoiceNumber?: SortOrder
+    damagedPart?: SortOrder
+    damagedPartSerial?: SortOrder
+    damageDate?: SortOrder
+    damageDescription?: SortOrder
+    customerSignature?: SortOrder
+    crediMemo?: SortOrder
+    replacementPart?: SortOrder
+    replacementSerial?: SortOrder
+    sellerSignature?: SortOrder
+    managementDate?: SortOrder
+    warrantyStatus?: SortOrder
+    technicianNotes?: SortOrder
+    resolutionDate?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type WarrantyMaxOrderByAggregateInput = {
     id?: SortOrder
-    customerId?: SortOrder
     customerName?: SortOrder
-    productName?: SortOrder
-    serialNumber?: SortOrder
-    description?: SortOrder
-    status?: SortOrder
+    customerPhone?: SortOrder
+    ownerName?: SortOrder
+    ownerPhone?: SortOrder
+    address?: SortOrder
+    brand?: SortOrder
+    model?: SortOrder
+    serial?: SortOrder
+    purchaseDate?: SortOrder
+    invoiceNumber?: SortOrder
+    damagedPart?: SortOrder
+    damagedPartSerial?: SortOrder
+    damageDate?: SortOrder
+    damageDescription?: SortOrder
+    customerSignature?: SortOrder
+    crediMemo?: SortOrder
+    replacementPart?: SortOrder
+    replacementSerial?: SortOrder
+    sellerSignature?: SortOrder
+    managementDate?: SortOrder
+    warrantyStatus?: SortOrder
+    technicianNotes?: SortOrder
+    resolutionDate?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type WarrantyMinOrderByAggregateInput = {
     id?: SortOrder
-    customerId?: SortOrder
     customerName?: SortOrder
-    productName?: SortOrder
-    serialNumber?: SortOrder
-    description?: SortOrder
-    status?: SortOrder
+    customerPhone?: SortOrder
+    ownerName?: SortOrder
+    ownerPhone?: SortOrder
+    address?: SortOrder
+    brand?: SortOrder
+    model?: SortOrder
+    serial?: SortOrder
+    purchaseDate?: SortOrder
+    invoiceNumber?: SortOrder
+    damagedPart?: SortOrder
+    damagedPartSerial?: SortOrder
+    damageDate?: SortOrder
+    damageDescription?: SortOrder
+    customerSignature?: SortOrder
+    crediMemo?: SortOrder
+    replacementPart?: SortOrder
+    replacementSerial?: SortOrder
+    sellerSignature?: SortOrder
+    managementDate?: SortOrder
+    warrantyStatus?: SortOrder
+    technicianNotes?: SortOrder
+    resolutionDate?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -3283,6 +3830,14 @@ export namespace Prisma {
 
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
+  }
+
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
+  }
+
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -3350,6 +3905,73 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type NestedStringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
 

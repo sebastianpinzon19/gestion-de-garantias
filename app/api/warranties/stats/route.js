@@ -1,34 +1,55 @@
 import { NextResponse } from "next/server"
+import { PrismaClient } from "@prisma/client"
 
-export async function GET(request) {
+const prisma = new PrismaClient()
+
+export async function GET() {
   try {
-    // In a real implementation, this would query the database
-    // Since we're getting an error, let's simplify this to return mock data
-    // without trying to access the database
+    const [total, pending, completed] = await Promise.all([
+      prisma.warranty.count(),
+      prisma.warranty.count({
+        where: {
+          warrantyStatus: "pending"
+        }
+      }),
+      prisma.warranty.count({
+        where: {
+          warrantyStatus: "completed"
+        }
+      })
+    ])
 
-    const stats = {
-      total: 20,
-      pending: 5,
-      approved: 12,
-      rejected: 3,
-    }
+    const recentWarranties = await prisma.warranty.findMany({
+      take: 5,
+      orderBy: {
+        createdAt: 'desc'
+      },
+      select: {
+        id: true,
+        customerName: true,
+        brand: true,
+        model: true,
+        serial: true,
+        warrantyStatus: true,
+        createdAt: true
+      }
+    })
 
     return NextResponse.json({
-      total: stats.total,
-      pendientes: stats.pending,
-      aprobadas: stats.approved,
-      rechazadas: stats.rejected,
+      success: true,
+      stats: {
+        total,
+        pending,
+        completed,
+        recentWarranties
+      }
     })
   } catch (error) {
-    console.error("Error fetching warranty stats:", error)
-
-    // Return a fallback response with mock data instead of an error
-    return NextResponse.json({
-      total: 20,
-      pendientes: 5,
-      aprobadas: 12,
-      rechazadas: 3,
-    })
+    console.error('Error fetching warranty stats:', error)
+    return NextResponse.json(
+      { success: false, message: "Error al obtener las estadísticas" },
+      { status: 500 }
+    )
   }
 }
 
