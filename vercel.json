@@ -1,12 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
-  "installCommand": "npm install",
-  "framework": "nextjs",
-  "builds": [
-    {
-      "src": "next.config.mjs",
-      "use": "@vercel/next"
-    }
-  ]
+  "buildCommand": "pnpm run build",
+  "installCommand": "pnpm install --no-frozen-lockfile",
+  "framework": "nextjs"
 }

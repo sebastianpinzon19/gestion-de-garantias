@@ -1,74 +1,64 @@
 import { NextResponse } from "next/server"
 import jwt from "jsonwebtoken"
+import { PrismaClient } from "@prisma/client"
+import * as argon2 from "argon2"
+
+const prisma = new PrismaClient()
 
 export async function POST(request) {
   try {
     const { email, password } = await request.json()
 
-    // Para propósitos de demostración, permitir acceso con credenciales específicas
-    if (email === "admin@ejemplo.com" && password === "admin123") {
-      const token = jwt.sign({ id: 1, email, role: "admin" }, process.env.JWT_SECRET || "secret-key", {
-        expiresIn: "7d",
-      })
+    // Buscar usuario en la base de datos
+    const user = await prisma.user.findUnique({
+      where: { email }
+    })
 
-      const response = NextResponse.json({
-        success: true,
-        token,
-        user: {
-          id: 1,
-          name: "Administrador",
-          email: "admin@ejemplo.com",
-          role: "admin",
-        },
-      })
-
-      // Establecer el token como cookie
-      response.cookies.set({
-        name: "token",
-        value: token,
-        httpOnly: true,
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7, // 7 días
-        sameSite: "strict",
-      })
-
-      return response
+    // Si no existe el usuario
+    if (!user) {
+      return NextResponse.json({ success: false, message: "Credenciales incorrectas" }, { status: 401 })
     }
 
-    if (email === "vendedor@ejemplo.com" && password === "vendedor123") {
-      const token = jwt.sign({ id: 2, email, role: "seller" }, process.env.JWT_SECRET || "secret-key", {
-        expiresIn: "7d",
-      })
-
-      const response = NextResponse.json({
-        success: true,
-        token,
-        user: {
-          id: 2,
-          name: "Vendedor Demo",
-          email: "vendedor@ejemplo.com",
-          role: "seller",
-        },
-      })
-
-      // Establecer el token como cookie
-      response.cookies.set({
-        name: "token",
-        value: token,
-        httpOnly: true,
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7, // 7 días
-        sameSite: "strict",
-      })
-
-      return response
+    // Verificar contraseña
+    const validPassword = await argon2.verify(user.password, password)
+    if (!validPassword) {
+      return NextResponse.json({ success: false, message: "Credenciales incorrectas" }, { status: 401 })
     }
 
-    // Si las credenciales no coinciden con las predefinidas
-    return NextResponse.json({ success: false, message: "Credenciales incorrectas" }, { status: 401 })
+    // Generar token
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      process.env.JWT_SECRET || "secret-key",
+      { expiresIn: "7d" }
+    )
+
+    const response = NextResponse.json({
+      success: true,
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    })
+
+    // Establecer el token como cookie
+    response.cookies.set({
+      name: "token",
+      value: token,
+      httpOnly: true,
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7, // 7 días
+      sameSite: "strict",
+    })
+
+    return response
   } catch (error) {
     console.error("Error en login:", error)
     return NextResponse.json({ success: false, message: "Error en el servidor" }, { status: 500 })
+  } finally {
+    await prisma.$disconnect()
   }
 }
 

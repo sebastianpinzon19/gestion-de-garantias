@@ -1,10 +1,8 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import { useLanguage } from "@/context/language-context"
 
 export function PieChart({ data }) {
-  const { t } = useLanguage()
   const chartRef = useRef(null)
 
   useEffect(() => {

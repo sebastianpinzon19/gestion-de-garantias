@@ -3,7 +3,7 @@ import nodemailer from "nodemailer"
 
 export async function GET(request) {
   try {
-    // Crear un transporte con las variables de entorno
+    // Create a transport with environment variables
     const transporter = nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
       port: Number.parseInt(process.env.EMAIL_PORT || "587"),
@@ -14,28 +14,28 @@ export async function GET(request) {
       },
     })
 
-    // Obtener los destinatarios de prueba
+    // Get test recipients
     const adminEmails = process.env.ADMIN_EMAILS?.split(",") || []
 
     if (adminEmails.length === 0) {
       return NextResponse.json(
         {
           success: false,
-          message: "No hay direcciones de correo configuradas en ADMIN_EMAILS",
+          message: "No email addresses configured in ADMIN_EMAILS",
         },
         { status: 400 },
       )
     }
 
-    // Enviar un correo de prueba
+    // Send a test email
     const info = await transporter.sendMail({
-      from: `"Sistema de Garantías" <${process.env.EMAIL_FROM}>`,
+      from: `"Warranty System" <${process.env.EMAIL_FROM}>`,
       to: adminEmails.join(","),
-      subject: "Prueba de configuración de email",
+      subject: "Email configuration test",
       html: `
-        <h1>Prueba de configuración de email</h1>
-        <p>Este es un correo de prueba para verificar que la configuración de email está funcionando correctamente.</p>
-        <p>Variables de entorno configuradas:</p>
+        <h1>Email Configuration Test</h1>
+        <p>This is a test email to verify that the email configuration is working correctly.</p>
+        <p>Configured environment variables:</p>
         <ul>
           <li><strong>EMAIL_HOST:</strong> ${process.env.EMAIL_HOST}</li>
           <li><strong>EMAIL_PORT:</strong> ${process.env.EMAIL_PORT}</li>
@@ -45,23 +45,23 @@ export async function GET(request) {
           <li><strong>ADMIN_EMAILS:</strong> ${process.env.ADMIN_EMAILS}</li>
           <li><strong>NEXT_PUBLIC_APP_URL:</strong> ${process.env.NEXT_PUBLIC_APP_URL}</li>
         </ul>
-        <p>Fecha y hora: ${new Date().toLocaleString()}</p>
+        <p>Date and time: ${new Date().toLocaleString()}</p>
       `,
     })
 
     return NextResponse.json({
       success: true,
-      message: "Correo de prueba enviado correctamente",
+      message: "Test email sent successfully",
       messageId: info.messageId,
       previewURL: nodemailer.getTestMessageUrl?.(info) || null,
     })
   } catch (error) {
-    console.error("Error al enviar el correo de prueba:", error)
+    console.error("Error sending test email:", error)
 
     return NextResponse.json(
       {
         success: false,
-        message: "Error al enviar el correo de prueba",
+        message: "Error sending test email",
         error: error.message,
         stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
       },

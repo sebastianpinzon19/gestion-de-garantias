@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useLanguage } from "@/providers/language-provider"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -12,7 +11,6 @@ import { Search, Download, Eye } from "lucide-react"
 import Link from "next/link"
 
 export default function AdminWarrantiesPage() {
-  const { t } = useLanguage()
   const [warranties, setWarranties] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
@@ -52,7 +50,7 @@ export default function AdminWarrantiesPage() {
             variant="outline"
             className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 border-yellow-300"
           >
-            {t("pending")}
+            Pending
           </Badge>
         )
       case "approved":
@@ -61,13 +59,13 @@ export default function AdminWarrantiesPage() {
             variant="outline"
             className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 border-green-300"
           >
-            {t("approved")}
+            Approved
           </Badge>
         )
       case "rejected":
         return (
           <Badge variant="outline" className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 border-red-300">
-            {t("rejected")}
+            Rejected
           </Badge>
         )
       default:
@@ -85,7 +83,7 @@ export default function AdminWarrantiesPage() {
   const formatDate = (dateString) => {
     if (!dateString) return "-"
     const date = new Date(dateString)
-    return new Intl.DateTimeFormat("es-ES").format(date)
+    return new Intl.DateTimeFormat("en-US").format(date)
   }
 
   if (loading) {
@@ -99,19 +97,19 @@ export default function AdminWarrantiesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight">{t("warranties")}</h2>
-        <p className="text-muted-foreground">{t("manageWarranties")}</p>
+        <h2 className="text-3xl font-bold tracking-tight">Warranties</h2>
+        <p className="text-muted-foreground">Manage Warranties</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>{t("warrantiesList")}</CardTitle>
-          <CardDescription>{t("warrantiesListDesc")}</CardDescription>
+          <CardTitle>Warranties List</CardTitle>
+          <CardDescription>List of all warranties in the system</CardDescription>
           <div className="flex flex-col sm:flex-row gap-4 mt-4">
             <div className="flex items-center flex-1">
               <Search className="h-4 w-4 mr-2 text-muted-foreground" />
               <Input
-                placeholder={t("searchWarranties")}
+                placeholder="Search warranties"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="max-w-sm"
@@ -119,13 +117,13 @@ export default function AdminWarrantiesPage() {
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder={t("filterByStatus")} />
+                <SelectValue placeholder="Filter by Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{t("allWarranties")}</SelectItem>
-                <SelectItem value="pending">{t("pendingWarranties")}</SelectItem>
-                <SelectItem value="approved">{t("approvedWarranties")}</SelectItem>
-                <SelectItem value="rejected">{t("rejectedWarranties")}</SelectItem>
+                <SelectItem value="all">All Warranties</SelectItem>
+                <SelectItem value="pending">Pending Warranties</SelectItem>
+                <SelectItem value="approved">Approved Warranties</SelectItem>
+                <SelectItem value="rejected">Rejected Warranties</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -134,11 +132,11 @@ export default function AdminWarrantiesPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{t("customer")}</TableHead>
-                <TableHead>{t("product")}</TableHead>
-                <TableHead>{t("date")}</TableHead>
-                <TableHead>{t("status")}</TableHead>
-                <TableHead className="text-right">{t("actions")}</TableHead>
+                <TableHead>Customer</TableHead>
+                <TableHead>Product</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -150,7 +148,7 @@ export default function AdminWarrantiesPage() {
                       {warranty.brand} {warranty.model}
                       <br />
                       <span className="text-xs text-muted-foreground">
-                        {t("serial")}: {warranty.serial}
+                        Serial: {warranty.serial}
                       </span>
                     </TableCell>
                     <TableCell>{formatDate(warranty.created_at)}</TableCell>
@@ -172,7 +170,7 @@ export default function AdminWarrantiesPage() {
               ) : (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-6">
-                    {t("noWarrantiesFound")}
+                    No warranties found
                   </TableCell>
                 </TableRow>
               )}
@@ -183,4 +181,3 @@ export default function AdminWarrantiesPage() {
     </div>
   )
 }
-

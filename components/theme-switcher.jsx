@@ -1,13 +1,11 @@
 "use client"
 
 import { useTheme } from "@/context/theme-context"
-import { useLanguage } from "@/context/language-context"
 import { Button } from "@/components/ui/button"
 import { Moon, Sun } from "lucide-react"
 
 export default function ThemeSwitcher() {
   const { theme, toggleTheme } = useTheme()
-  const { t } = useLanguage()
 
   // Función para manejar el clic y asegurar que el cambio de tema funcione
   const handleToggleTheme = () => {
@@ -24,7 +22,7 @@ export default function ThemeSwitcher() {
     >
       {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
       <span className="sr-only md:not-sr-only md:inline-block">
-        {theme === "light" ? t("darkMode") : t("lightMode")}
+        {theme === "light" ? "Dark Mode" : "Light Mode"}
       </span>
     </Button>
   )

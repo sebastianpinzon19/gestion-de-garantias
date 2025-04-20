@@ -1,113 +1,143 @@
 import { NextResponse } from "next/server"
-import { sendAdminNotification } from "@/lib/email-service"
+import prisma from "@/lib/prisma"
 
-export async function GET(request) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(request.url)
-    const status = searchParams.get("status")
-
-    // Mock data for warranties
-    let warranties = [
-      {
-        id: 1001,
-        customer_name: "Juan Pérez",
-        brand: "FrostCool",
-        model: "XYZ-123",
-        serial: "RF123456789",
-        created_at: "2023-05-15",
-        status: "pending",
-        credi_memo: "",
-        assigned_to: null,
+    const warranties = await prisma.warranty.findMany({
+      orderBy: {
+        createdAt: "desc",
       },
-      {
-        id: 1002,
-        customer_name: "María González",
-        brand: "WashMaster",
-        model: "ABC-456",
-        serial: "LV987654321",
-        created_at: "2023-05-10",
-        status: "approved",
-        credi_memo: "CM-002",
-        assigned_to: 2,
-      },
-      {
-        id: 1003,
-        customer_name: "Carlos Rodríguez",
-        brand: "ViewTech",
-        model: "DEF-789",
-        serial: "TV567891234",
-        created_at: "2023-05-05",
-        status: "rejected",
-        credi_memo: "CM-003",
-        assigned_to: 2,
-      },
-      {
-        id: 1004,
-        customer_name: "Ana Martínez",
-        brand: "HomeHeat",
-        model: "GHI-012",
-        serial: "ES432109876",
-        created_at: "2023-05-01",
-        status: "pending",
-        credi_memo: "CM-004",
-        assigned_to: null,
-      },
-      {
-        id: 1005,
-        customer_name: "Pedro Sánchez",
-        brand: "KitchenPro",
-        model: "JKL-345",
-        serial: "MW345678912",
-        created_at: "2023-04-28",
-        status: "approved",
-        credi_memo: "CM-005",
-        assigned_to: 3,
-      },
-    ]
-
-    // Filter by status if provided
-    if (status && status !== "all") {
-      warranties = warranties.filter((w) => w.status === status)
-    }
+    })
 
     return NextResponse.json(warranties)
   } catch (error) {
     console.error("Error fetching warranties:", error)
-    return NextResponse.json([])
+    return NextResponse.json(
+      { message: "Error fetching warranties" },
+      { status: 500 }
+    )
   }
 }
 
 export async function POST(request) {
   try {
     const data = await request.json()
+    
+    // Validar campos requeridos
+    const requiredFields = [
+      "customerName",
+      "customerPhone",
+      "address",
+      "brand",
+      "model",
+      "serial",
+      "purchaseDate",
+      "invoiceNumber",
+      "damagedPart",
+      "damageDate",
+      "damageDescription",
+      "customerSignature"
+    ]
 
-    // En una implementación real, esto guardaría en la base de datos
-    // y generaría un ID único
-    const newWarranty = {
-      id: Math.floor(1000 + Math.random() * 9000), // Random ID for demo
-      ...data,
-      created_at: new Date().toISOString().split("T")[0],
-      status: "pending",
-      assigned_to: null,
+    const missingFields = requiredFields.filter(field => !data[field])
+    if (missingFields.length > 0) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          message: `Campos requeridos faltantes: ${missingFields.join(", ")}` 
+        },
+        { status: 400 }
+      )
     }
 
-    // Enviar notificación por correo a los administradores
-    await sendAdminNotification(newWarranty)
+    // Validar y formatear fechas
+    const formatDate = (dateString) => {
+      if (!dateString) return null;
+      try {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) {
+          throw new Error("Fecha inválida");
+        }
+        return date;
+      } catch (error) {
+        console.error("Error al formatear fecha:", error);
+        throw new Error(`Fecha inválida: ${dateString}`);
+      }
+    };
 
-    return NextResponse.json({
-      success: true,
-      message: "Garantía creada correctamente",
-      warranty: newWarranty,
+    // Validar fechas requeridas
+    try {
+      formatDate(data.purchaseDate);
+      formatDate(data.damageDate);
+    } catch (error) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          message: error.message 
+        },
+        { status: 400 }
+      );
+    }
+
+    // Verificar conexión a la base de datos
+    try {
+      await prisma.$connect();
+    } catch (error) {
+      console.error("Error de conexión a la base de datos:", error);
+      return NextResponse.json(
+        { 
+          success: false,
+          message: "Error de conexión a la base de datos",
+          error: error.message 
+        },
+        { status: 500 }
+      );
+    }
+
+    // Crear la garantía
+    const warranty = await prisma.warranty.create({
+      data: {
+        customerName: data.customerName,
+        customerPhone: data.customerPhone,
+        ownerName: data.ownerName || null,
+        ownerPhone: data.ownerPhone || null,
+        address: data.address,
+        brand: data.brand,
+        model: data.model,
+        serial: data.serial,
+        purchaseDate: formatDate(data.purchaseDate),
+        invoiceNumber: data.invoiceNumber,
+        damagedPart: data.damagedPart,
+        damagedPartSerial: data.damagedPartSerial || null,
+        damageDate: formatDate(data.damageDate),
+        damageDescription: data.damageDescription,
+        customerSignature: data.customerSignature,
+        warrantyStatus: "pending",
+        
+        // Campos opcionales del vendedor
+        crediMemo: data.crediMemo || null,
+        replacementPart: data.replacementPart || null,
+        replacementSerial: data.replacementSerial || null,
+        sellerSignature: data.sellerSignature || null,
+        managementDate: data.managementDate ? formatDate(data.managementDate) : null,
+        technicianNotes: data.technicianNotes || null,
+        resolutionDate: data.resolutionDate ? formatDate(data.resolutionDate) : null,
+      }
     })
+
+    return NextResponse.json(warranty)
   } catch (error) {
     console.error("Error creating warranty:", error)
     return NextResponse.json(
-      {
+      { 
         success: false,
         message: "Error al crear la garantía",
+        error: error.message 
       },
-      { status: 500 },
+      { status: 500 }
     )
+  } finally {
+    await prisma.$disconnect();
   }
 }
 
