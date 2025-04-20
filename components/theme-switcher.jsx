@@ -1,16 +1,15 @@
 "use client"
 
-import { useTheme } from "@/context/theme-context"
+import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
 import { Moon, Sun } from "lucide-react"
 
 export default function ThemeSwitcher() {
-  const { theme, toggleTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
 
   // Función para manejar el clic y asegurar que el cambio de tema funcione
   const handleToggleTheme = () => {
-    console.log("Cambiando tema de", theme)
-    toggleTheme()
+    setTheme(theme === "light" ? "dark" : "light")
   }
 
   return (
