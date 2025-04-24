@@ -3,6 +3,7 @@ ignoredBuiltDependencies:
   - '@prisma/engines'
   - bcrypt
   - prisma
+  - unrs-resolver
 
 packages:
-  - "."
+  - .
