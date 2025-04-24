@@ -1,10 +1,15 @@
 "use client"
 
-import { ThemeProvider } from "@/context/theme-context"
+import { ThemeProvider } from "@/components/theme-provider"
 
-export function Providers({ children }) {
+export default function Providers({ children }) {
   return (
-    <ThemeProvider>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
       {children}
     </ThemeProvider>
   )

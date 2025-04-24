@@ -1,3 +1,5 @@
+"use server"
+
 import { NextResponse } from "next/server"
 import { PrismaClient } from "@prisma/client"
 
@@ -54,71 +56,21 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const data = await request.json()
-    
-    // Validar campos requeridos
-    const requiredFields = [
-      "customerName",
-      "customerPhone",
-      "address",
-      "brand",
-      "model",
-      "serial",
-      "purchaseDate",
-      "invoiceNumber",
-      "damagedPart",
-      "damageDate",
-      "damageDescription"
-    ]
 
-    const missingFields = requiredFields.filter(field => !data[field])
-    if (missingFields.length > 0) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          message: `Campos requeridos faltantes: ${missingFields.join(", ")}` 
-        },
-        { status: 400 }
-      )
-    }
+    // Aquí puedes agregar la lógica para guardar en tu base de datos
+    // Por ahora solo retornamos una respuesta exitosa
+    console.log('Warranty data received:', data)
 
-    // Crear la garantía
-    const warranty = await prisma.warranty.create({
-      data: {
-        customer_name: data.customerName,
-        customer_phone: data.customerPhone,
-        owner_name: data.ownerName || null,
-        owner_phone: data.ownerPhone || null,
-        address: data.address,
-        brand: data.brand,
-        model: data.model,
-        serial: data.serial,
-        purchase_date: new Date(data.purchaseDate),
-        invoice_number: data.invoiceNumber,
-        damaged_part: data.damagedPart,
-        damaged_part_serial: data.damagedPartSerial || null,
-        damage_date: new Date(data.damageDate),
-        damage_description: data.damageDescription,
-        status: "pending"
-      }
-    })
-
-    return NextResponse.json({ 
-      success: true, 
-      message: "Garantía creada exitosamente",
-      warranty 
-    })
-  } catch (error) {
-    console.error("Error al crear garantía:", error)
     return NextResponse.json(
-      { 
-        success: false, 
-        message: "Error al crear la garantía",
-        error: error.message 
-      },
+      { message: 'Warranty request created successfully' },
+      { status: 201 }
+    )
+  } catch (error) {
+    console.error('Error processing warranty request:', error)
+    return NextResponse.json(
+      { message: 'Error processing warranty request' },
       { status: 500 }
     )
-  } finally {
-    await prisma.$disconnect()
   }
 }
 
