@@ -19,8 +19,15 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
-    }
+      "@/*": ["./*"],
+      "@components/*": ["./components/*"],
+      "@modules/*": ["./app/modules/*"],
+      "@providers/*": ["./providers/*"],
+      "@/modules/*": ["./app/modules/*"],
+      "@/components/*": ["./components/*"],
+      "@/providers/*": ["./providers/*"]
+    },
+    "baseUrl": "."
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]

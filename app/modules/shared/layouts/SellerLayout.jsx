@@ -1,69 +1,21 @@
-import { History, Home, FileText, PlusCircle, LogOut } from "lucide-react"
+"use client"
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
-import { useState, useEffect } from "react"
+import { FileText, History, Home, LogOut, Menu, PlusCircle } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import ThemeSwitcher from "@/components/common/theme-switcher"
+import ThemeSwitcher from "@/components/theme-switcher.jsx"
+import Image from "next/image"
+import { useAuth } from "@/providers/auth-provider"
 
-export default function DashboardLayout({ children }) {
-  const router = useRouter()
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    // Verificar si el usuario está autenticado
-    if (typeof window !== "undefined") {
-      try {
-        const token = localStorage.getItem("token")
-        const userData = localStorage.getItem("user")
-
-        if (!token || !userData) {
-          router.push("/login")
-          return
-        }
-
-        const parsedUser = JSON.parse(userData)
-        // Ensure only sellers or admins can access the dashboard
-        if (parsedUser.role !== "seller" && parsedUser.role !== "admin") {
-          router.push("/login")
-          return
-        }
-        setUser(parsedUser)
-      } catch (error) {
-        console.error("Error parsing user data:", error)
-        router.push("/login")
-      } finally {
-        setLoading(false)
-      }
-    }
-  }, [router])
-
-  const handleLogout = () => {
-    if (typeof window !== "undefined") {
-      try {
-        localStorage.removeItem("token")
-        localStorage.removeItem("user")
-      } catch (error) {
-        console.error("Error during logout:", error)
-      }
-    }
-    router.push("/login")
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    )
-  }
+export function SellerLayout({ children }) {
+  const { user, logout } = useAuth()
 
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900 transition-colors duration-200">
       <header className="bg-gradient-to-r from-blue-600 via-blue-500 to-yellow-500 text-white shadow-md">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          <div className="flex items-center">
+          <div className="flex items-center gap-4">
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="md:hidden text-white">
@@ -73,7 +25,7 @@ export default function DashboardLayout({ children }) {
               <SheetContent side="left" className="w-64 p-0 bg-gray-900 text-white">
                 <div className="py-6 px-4 border-b border-gray-800">
                   <h2 className="text-xl font-bold">Warranty System</h2>
-                  <p className="text-sm text-gray-400">Seller</p>
+                  <p className="text-sm text-gray-400">Seller Portal</p>
                 </div>
                 <nav className="py-4">
                   <MobileNavItems />
@@ -81,8 +33,15 @@ export default function DashboardLayout({ children }) {
               </SheetContent>
             </Sheet>
 
-            <Link href="/dashboard">
-              <h1 className="text-xl font-bold ml-2 md:ml-0">Warranty System</h1>
+            <Link href="/seller/dashboard">
+              <Image
+                src="/logo empresa.png"
+                alt="Company Logo"
+                width={150}
+                height={50}
+                style={{ width: 'auto', height: 'auto' }}
+                priority
+              />
             </Link>
           </div>
 
@@ -91,7 +50,7 @@ export default function DashboardLayout({ children }) {
             <span className="hidden md:inline-block text-sm">
               Welcome, {user?.name || "Seller"}
             </span>
-            <Button variant="ghost" size="sm" onClick={handleLogout} className="text-white hover:bg-white/20">
+            <Button variant="ghost" size="sm" onClick={logout} className="text-white hover:bg-white/20">
               <LogOut className="h-4 w-4 mr-1" />
               <span className="hidden md:inline-block">Logout</span>
             </Button>
@@ -115,28 +74,28 @@ export default function DashboardLayout({ children }) {
 function DesktopNavItems() {
   return (
     <>
-      <Link href="/dashboard">
+      <Link href="/seller/dashboard">
         <div className="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition-colors">
           <Home className="h-5 w-5 mr-3" />
-          <span>Dashboard</span>
+          <span>Home</span>
         </div>
       </Link>
 
-      <Link href="/dashboard/garantias">
+      <Link href="/seller/warranties">
         <div className="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition-colors">
           <FileText className="h-5 w-5 mr-3" />
           <span>Warranties</span>
         </div>
       </Link>
 
-      <Link href="/dashboard/garantias/nuevas">
+      <Link href="/seller/warranties/new">
         <div className="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition-colors">
           <PlusCircle className="h-5 w-5 mr-3" />
-          <span>Pending Warranties</span>
+          <span>New Warranty</span>
         </div>
       </Link>
 
-      <Link href="/dashboard/garantias/historial">
+      <Link href="/seller/warranties/history">
         <div className="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition-colors">
           <History className="h-5 w-5 mr-3" />
           <span>History</span>
@@ -149,28 +108,28 @@ function DesktopNavItems() {
 function MobileNavItems() {
   return (
     <>
-      <Link href="/dashboard">
+      <Link href="/seller/dashboard">
         <div className="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">
           <Home className="h-5 w-5 mr-3" />
-          <span>Dashboard</span>
+          <span>Home</span>
         </div>
       </Link>
 
-      <Link href="/dashboard/garantias">
+      <Link href="/seller/warranties">
         <div className="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">
           <FileText className="h-5 w-5 mr-3" />
           <span>Warranties</span>
         </div>
       </Link>
 
-      <Link href="/dashboard/garantias/nuevas">
+      <Link href="/seller/warranties/new">
         <div className="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">
           <PlusCircle className="h-5 w-5 mr-3" />
-          <span>Pending Warranties</span>
+          <span>New Warranty</span>
         </div>
       </Link>
 
-      <Link href="/dashboard/garantias/historial">
+      <Link href="/seller/warranties/history">
         <div className="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">
           <History className="h-5 w-5 mr-3" />
           <span>History</span>
@@ -178,4 +137,4 @@ function MobileNavItems() {
       </Link>
     </>
   )
-}
+} 

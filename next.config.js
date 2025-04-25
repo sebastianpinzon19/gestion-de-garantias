@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
   
   env: {
     DATABASE_URL: process.env.VERCEL_DATABASE_URL || process.env.LOCAL_DATABASE_URL,
@@ -74,6 +73,26 @@ const nextConfig = {
         source: '/apple-icon.png',
         destination: '/public/apple-icon.png'
       }
+    ]
+  },
+
+  async redirects() {
+    return [
+      {
+        source: '/dashboard',
+        destination: '/modules/seller/pages/dashboard',
+        permanent: true,
+      },
+      {
+        source: '/admin',
+        destination: '/modules/admin/pages/dashboard',
+        permanent: true,
+      },
+      {
+        source: '/warranty',
+        destination: '/modules/warranty/pages/formulario',
+        permanent: true,
+      },
     ]
   }
 };

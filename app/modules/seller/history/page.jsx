@@ -10,16 +10,16 @@ import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDate } from "@/lib/utils"
 
-export default function HistorialGarantias() {
+export default function HistoryPage() {
   const { toast } = useToast()
-  const [garantias, setGarantias] = useState([])
-  const [filtro, setFiltro] = useState("all")
-  const [busqueda, setBusqueda] = useState("")
-  const [garantiasFiltradas, setGarantiasFiltradas] = useState([])
+  const [warranties, setWarranties] = useState([])
+  const [filter, setFilter] = useState("all")
+  const [search, setSearch] = useState("")
+  const [filteredWarranties, setFilteredWarranties] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const fetchGarantias = async () => {
+    const fetchWarranties = async () => {
       try {
         setLoading(true)
         // Get warranties that are not pending
@@ -28,8 +28,8 @@ export default function HistorialGarantias() {
         if (response.ok) {
           const data = await response.json()
           // Filter only warranties that are not pending
-          const historicoGarantias = data.filter((g) => g.status !== "pending")
-          setGarantias(historicoGarantias)
+          const warrantyHistory = data.filter((w) => w.status !== "pending")
+          setWarranties(warrantyHistory)
         } else {
           throw new Error("Error loading warranty history")
         }
@@ -45,36 +45,35 @@ export default function HistorialGarantias() {
       }
     }
 
-    fetchGarantias()
+    fetchWarranties()
   }, [toast])
 
   useEffect(() => {
     // Apply filters
-    let resultado = garantias
+    let result = warranties
 
     // Filter by status
-    if (filtro !== "all") {
-      resultado = resultado.filter((g) => g.status === filtro)
+    if (filter !== "all") {
+      result = result.filter((w) => w.status === filter)
     }
 
     // Filter by search
-    if (busqueda.trim() !== "") {
-      const terminoBusqueda = busqueda.toLowerCase()
-      resultado = resultado.filter(
-        (g) =>
-          g.customer_name?.toLowerCase().includes(terminoBusqueda) ||
-          g.brand?.toLowerCase().includes(terminoBusqueda) ||
-          g.model?.toLowerCase().includes(terminoBusqueda) ||
-          g.serial?.toLowerCase().includes(terminoBusqueda) ||
-          g.credi_memo?.toLowerCase().includes(terminoBusqueda),
+    if (search.trim() !== "") {
+      const searchTerm = search.toLowerCase()
+      result = result.filter(
+        (w) =>
+          w.customer_name?.toLowerCase().includes(searchTerm) ||
+          w.brand?.toLowerCase().includes(searchTerm) ||
+          w.model?.toLowerCase().includes(searchTerm) ||
+          w.serial?.toLowerCase().includes(searchTerm)
       )
     }
 
-    setGarantiasFiltradas(resultado)
-  }, [garantias, filtro, busqueda])
+    setFilteredWarranties(result)
+  }, [warranties, filter, search])
 
-  const getEstadoBadge = (estado) => {
-    switch (estado) {
+  const getStatusBadge = (status) => {
+    switch (status) {
       case "approved":
         return (
           <Badge
@@ -106,7 +105,7 @@ export default function HistorialGarantias() {
 
       <div className="flex flex-col md:flex-row gap-4">
         <div className="w-full md:w-1/3">
-          <Select value={filtro} onValueChange={setFiltro}>
+          <Select value={filter} onValueChange={setFilter}>
             <SelectTrigger className="border-blue-200 dark:border-blue-800">
               <SelectValue placeholder="Filter by Status" />
             </SelectTrigger>
@@ -120,8 +119,8 @@ export default function HistorialGarantias() {
         <div className="w-full md:w-2/3">
           <Input
             placeholder="Search warranties"
-            value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             className="border-blue-200 dark:border-blue-800"
           />
         </div>
@@ -132,7 +131,7 @@ export default function HistorialGarantias() {
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
           <p className="ml-3 text-gray-700 dark:text-gray-300">Loading History...</p>
         </div>
-      ) : garantiasFiltradas.length > 0 ? (
+      ) : filteredWarranties.length > 0 ? (
         <div className="rounded-md border border-blue-200 dark:border-blue-800">
           <Table>
             <TableHeader className="bg-blue-50 dark:bg-blue-900/30">
@@ -140,23 +139,21 @@ export default function HistorialGarantias() {
                 <TableHead>ID</TableHead>
                 <TableHead>Customer</TableHead>
                 <TableHead>Product</TableHead>
-                <TableHead>Credi Memo</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {garantiasFiltradas.map((garantia) => (
-                <TableRow key={garantia.id} className="hover:bg-blue-50 dark:hover:bg-blue-900/10">
-                  <TableCell>{garantia.id}</TableCell>
-                  <TableCell>{garantia.customer_name}</TableCell>
-                  <TableCell>{`${garantia.brand} ${garantia.model}`}</TableCell>
-                  <TableCell>{garantia.credi_memo || "-"}</TableCell>
-                  <TableCell>{formatDate(garantia.created_at)}</TableCell>
-                  <TableCell>{getEstadoBadge(garantia.status)}</TableCell>
+              {filteredWarranties.map((warranty) => (
+                <TableRow key={warranty.id} className="hover:bg-blue-50 dark:hover:bg-blue-900/10">
+                  <TableCell>{warranty.id}</TableCell>
+                  <TableCell>{warranty.customer_name}</TableCell>
+                  <TableCell>{`${warranty.brand} ${warranty.model}`}</TableCell>
+                  <TableCell>{formatDate(warranty.created_at)}</TableCell>
+                  <TableCell>{getStatusBadge(warranty.status)}</TableCell>
                   <TableCell className="text-right">
-                    <Link href={`/dashboard/garantias/${garantia.id}`}>
+                    <Link href={`/seller/warranties/${warranty.id}`}>
                       <Button
                         variant="outline"
                         size="sm"
@@ -179,4 +176,4 @@ export default function HistorialGarantias() {
       )}
     </div>
   )
-}
+} 

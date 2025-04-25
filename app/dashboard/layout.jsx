@@ -1,34 +1,36 @@
 "use client"
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { FileText, History, Home, LogOut, Menu, PlusCircle, ListTodo } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import ThemeSwitcher from "@/components/theme-switcher"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
-import { useAuth } from "@/providers/auth-provider"
+import { useEffect } from "react"
+import { useAuth } from "@/modules/shared/hooks/useAuth"
 import Image from "next/image"
 
 export default function DashboardLayout({ children }) {
-  const { user, logout, isLoading, isAuthenticated } = useAuth()
+  const { user, logout, isAuthenticated } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
-    if (!isLoading) {
-      if (!isAuthenticated) {
-        router.push("/login")
-      } else if (user?.role !== "seller" && user?.role !== "admin") {
-        router.push("/login")
-      }
+    if (!isAuthenticated) {
+      router.replace("/login")
+      return
     }
-  }, [isAuthenticated, isLoading, router, user])
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    )
+    // Redirigir según el rol
+    if (user.role === "admin") {
+      router.replace("/admin/dashboard")
+    } else if (user.role === "seller") {
+      router.replace("/seller/dashboard")
+    }
+  }, [isAuthenticated, user, router])
+
+  // Mientras verifica la autenticación, mostrar loading o nada
+  if (!isAuthenticated) {
+    return null
   }
 
   return (

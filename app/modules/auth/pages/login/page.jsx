@@ -1,5 +1,4 @@
 "use client"
-
 import { useState } from "react"
 import { useAuth } from "@/providers/auth-provider"
 import { LoginForm } from "@/modules/auth/components/LoginForm"
@@ -18,7 +17,7 @@ export default function LoginPage() {
         setError(result.message)
       }
     } catch (error) {
-      setError("Error connecting to the server")
+      setError("Error al conectar con el servidor")
     } finally {
       setIsLoading(false)
     }
@@ -29,11 +28,11 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <h2 className="mt-6 text-3xl font-extrabold text-gray-900 dark:text-white">
-            Login
+            Iniciar Sesión
           </h2>
         </div>
         <LoginForm onSubmit={handleLogin} error={error} isLoading={isLoading} />
       </div>
     </div>
   )
-}
+} 

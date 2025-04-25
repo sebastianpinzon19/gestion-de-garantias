@@ -6,27 +6,21 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import ThemeSwitcher from "@/components/theme-switcher"
 import Image from "next/image"
+import { useAuth } from "@/providers/auth-provider"
 
 export default function HomePage() {
   const router = useRouter()
+  const { isAuthenticated, user } = useAuth()
 
-  // Check for active session but don't redirect automatically
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("token")
-      const userData = localStorage.getItem("user")
-
-      if (token && userData) {
-        try {
-          const user = JSON.parse(userData)
-          // Store user role in state instead of redirecting
-          console.log("User is logged in as:", user.role)
-        } catch (error) {
-          console.error("Error parsing user data:", error)
-        }
+    if (isAuthenticated) {
+      if (user?.role === "admin") {
+        router.replace("/admin/dashboard")
+      } else if (user?.role === "seller") {
+        router.replace("/seller/dashboard")
       }
     }
-  }, [])
+  }, [isAuthenticated, user, router])
 
   return (
     <div className="flex min-h-screen flex-col bg-white dark:bg-gray-900 transition-colors duration-200">
