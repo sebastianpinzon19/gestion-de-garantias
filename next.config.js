@@ -3,7 +3,7 @@ const nextConfig = {
   reactStrictMode: true,
   
   env: {
-    DATABASE_URL: process.env.VERCEL_DATABASE_URL || process.env.LOCAL_DATABASE_URL,
+    DATABASE_URL: process.env.DATABASE_URL,
     APP_TITLE: 'Sistema de Gestión de Garantías'
   },
   
@@ -29,7 +29,7 @@ const nextConfig = {
   },
 
   // Configuración de páginas
-  pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
+  pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'mdx'],
   
   // Headers de seguridad
   async headers() {
