@@ -1,8 +1,8 @@
 "use client"
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { SellerLayout } from "@/modules/shared/layouts/SellerLayout"
-import { useAuth } from "@/providers/auth-provider"
+import { SellerLayout } from "@modules/shared/layouts/SellerLayout"
+import { useAuth } from "@providers/auth-provider"
 
 export default function Layout({ children }) {
   const router = useRouter()
