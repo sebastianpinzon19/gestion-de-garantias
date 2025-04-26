@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/modules/shared/hooks/useAuth"
+import { useAuth } from "@providers/auth-provider"
 
 export default function SellerDashboardPage() {
   const [warranties, setWarranties] = useState([])

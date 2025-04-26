@@ -1,13 +1,13 @@
 "use client"
 
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import { Button } from "@components/ui/button"
 import { FileText, History, Home, LogOut, Menu, PlusCircle, ListTodo } from "lucide-react"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import ThemeSwitcher from "@/components/theme-switcher"
+import { Sheet, SheetContent, SheetTrigger } from "@components/ui/sheet"
+import ThemeSwitcher from "@components/theme-switcher"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
-import { useAuth } from "@/modules/shared/hooks/useAuth"
+import { useAuth } from "@providers/auth-provider"
 import Image from "next/image"
 
 export default function DashboardLayout({ children }) {
