@@ -20,7 +20,7 @@ export async function GET(request, { params }) {
 
     return NextResponse.json(warranty)
   } catch (error) {
-    console.error("Error fetching warranty:", error)
+    console.error("Error fetching warranty:", error.stack) // Log stack trace
     return NextResponse.json(
       { message: "Error fetching warranty" },
       { status: 500 }
@@ -51,7 +51,7 @@ export async function PUT(request, { params }) {
 
     return NextResponse.json(warranty)
   } catch (error) {
-    console.error("Error updating warranty:", error)
+    console.error("Error updating warranty:", error.stack) // Log stack trace
     return NextResponse.json(
       { message: "Error updating warranty" },
       { status: 500 }
@@ -71,7 +71,7 @@ export async function DELETE(request, { params }) {
 
     return NextResponse.json({ message: "Warranty deleted successfully" })
   } catch (error) {
-    console.error("Error deleting warranty:", error)
+    console.error("Error deleting warranty:", error.stack) // Log stack trace
     return NextResponse.json(
       { message: "Error deleting warranty" },
       { status: 500 }

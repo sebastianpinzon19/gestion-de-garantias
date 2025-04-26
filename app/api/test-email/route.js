@@ -29,7 +29,7 @@ export async function GET(request) {
 
     // Send a test email
     const info = await transporter.sendMail({
-      from: `"Warranty System" <${process.env.EMAIL_FROM}>`,
+      from: `"Warranty System" <${process.env.EMAIL_FROM || "no-reply@example.com"}>`, // Fallback for EMAIL_FROM
       to: adminEmails.join(","),
       subject: "Email configuration test",
       html: `

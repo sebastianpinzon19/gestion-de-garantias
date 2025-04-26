@@ -33,8 +33,16 @@ export async function POST(request, { params }) {
       RETURNING *
     `
 
-    // Send email notification to seller
-    await sendSellerAssignmentNotification(updatedWarranty[0], seller[0])
+    try {
+      // Send email notification to seller
+      await sendSellerAssignmentNotification(updatedWarranty[0], seller[0])
+    } catch (emailError) {
+      console.error("Error sending email to seller:", emailError)
+      return NextResponse.json(
+        { success: false, message: "Warranty assigned, but email notification failed" },
+        { status: 500 }
+      )
+    }
 
     return NextResponse.json({
       success: true,

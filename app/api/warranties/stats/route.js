@@ -45,7 +45,7 @@ export async function GET() {
       }
     })
   } catch (error) {
-    console.error('Error fetching warranty stats:', error)
+    console.error('Error fetching warranty stats:', error.stack); // Log stack trace
     return NextResponse.json(
       { success: false, message: "Error al obtener las estadísticas" },
       { status: 500 }

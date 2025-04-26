@@ -3,6 +3,9 @@
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 async function vercelBuild() {
   try {
@@ -39,7 +42,7 @@ async function vercelBuild() {
 
     // Instalar dependencias
     console.log('📦 Installing dependencies...');
-    execSync('pnpm install', { stdio: 'inherit' });
+    execSync('npm install', { stdio: 'inherit' });
 
     // Generar Prisma Client
     console.log('🔧 Generating Prisma Client...');
@@ -69,6 +72,8 @@ async function vercelBuild() {
   } catch (error) {
     console.error('❌ Build failed:', error);
     process.exit(1);
+  } finally {
+    await prisma.$disconnect(); // Cleanup PrismaClient
   }
 }
 
