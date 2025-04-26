@@ -9,7 +9,6 @@ import ThemeSwitcher from "@/components/theme-switcher"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import Image from "next/image"
-import { useTheme } from 'gestion-de-garantias\context\theme-context.jsx'
 
 export default function AdminLayout({ children }) {
   const { theme } = useTheme()

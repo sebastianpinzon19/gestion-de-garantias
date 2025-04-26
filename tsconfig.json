@@ -19,14 +19,12 @@
       }
     ],
     "paths": {
-      "@/*": ["app/*"],
+      "@/*": ["./*"],
       "@components/*": ["./components/*"],
       "@modules/*": ["./app/modules/*"],
       "@providers/*": ["./providers/*"],
-      "@/modules/*": ["./app/modules/*"],
-      "@/components/*": ["./components/*"],
-      "@/providers/*": ["./providers/*"],
-      "@/context/*": ["./app/context/*"]
+      "@context/*": ["./context/*"],
+      "@lib/*": ["./lib/*"]
     },
     "baseUrl": "."
   },
