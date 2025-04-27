@@ -1,4 +1,8 @@
 import { NextResponse } from "next/server"
+import { PrismaClient } from "@prisma/client"
+import argon2 from "argon2"
+
+const prisma = new PrismaClient()
 
 export async function POST(request) {
   try {
@@ -53,16 +57,45 @@ export async function POST(request) {
       return response
     }
 
-    return NextResponse.json(
-      { success: false, message: "Invalid credentials" },
-      { status: 401 }
-    )
+    // Login real con base de datos
+    const user = await prisma.user.findUnique({ where: { email } })
+    if (!user) {
+      return NextResponse.json(
+        { success: false, message: "Invalid credentials" },
+        { status: 401 }
+      )
+    }
+    const valid = await argon2.verify(user.password, password)
+    if (!valid) {
+      return NextResponse.json(
+        { success: false, message: "Invalid credentials" },
+        { status: 401 }
+      )
+    }
+    // No enviar la contraseña al frontend
+    const { password: _, ...userWithoutPassword } = user
+    const response = NextResponse.json({
+      success: true,
+      token: "real-user-token",
+      user: userWithoutPassword,
+    })
+    response.cookies.set({
+      name: "token",
+      value: "real-user-token",
+      httpOnly: true,
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+      sameSite: "strict",
+    })
+    return response
   } catch (error) {
     console.error("Login error:", error)
     return NextResponse.json(
       { success: false, message: "Server error" },
       { status: 500 }
     )
+  } finally {
+    await prisma.$disconnect()
   }
 }
 
