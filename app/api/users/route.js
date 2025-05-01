@@ -1,6 +1,5 @@
-import { sql } from "@/lib/db"
+import { db } from "@/lib/db"
 import { NextResponse } from "next/server"
-import { PrismaClient } from "@prisma/client"
 import * as argon2 from "argon2"
 
 export async function GET(request) {
@@ -8,21 +7,20 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url)
     const role = searchParams.get("role")
 
-    // Construir la consulta SQL
-    let query = `
-      SELECT id, name, email, role, created_at
-      FROM users
-    `
-
-    // Filtrar por rol si se proporciona
-    if (role) {
-      query += ` WHERE role = '${role}'`
-    }
-
-    query += ` ORDER BY name`
-
-    // Ejecutar la consulta
-    const users = await sql.unsafe(query)
+    // Construir la consulta con Prisma
+    const users = await db.user.findMany({
+      where: role ? { role } : undefined,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true
+      },
+      orderBy: {
+        name: 'asc'
+      }
+    })
 
     return NextResponse.json(users)
   } catch (error) {
@@ -41,11 +39,11 @@ export async function POST(request) {
     }
 
     // Verificar si el correo ya existe
-    const existingUser = await sql`
-      SELECT * FROM users WHERE email = ${email}
-    `
+    const existingUser = await db.user.findUnique({
+      where: { email }
+    })
 
-    if (existingUser.length > 0) {
+    if (existingUser) {
       return NextResponse.json({ success: false, message: "El correo electrónico ya está registrado" }, { status: 400 })
     }
 
@@ -53,16 +51,25 @@ export async function POST(request) {
     const hashedPassword = await argon2.hash(password)
 
     // Insertar usuario
-    const result = await sql`
-      INSERT INTO users (name, email, password, role)
-      VALUES (${name}, ${email}, ${hashedPassword}, ${role})
-      RETURNING id, name, email, role
-    `
+    const user = await db.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        role
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true
+      }
+    })
 
     return NextResponse.json({
       success: true,
       message: "Usuario creado correctamente",
-      user: result[0],
+      user,
     })
   } catch (error) {
     console.error("Error creating user:", error)

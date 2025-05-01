@@ -1,123 +1,119 @@
 "use client"
 
-import { createContext, useContext, useEffect, useState } from "react"
-import { useRouter, usePathname } from "next/navigation"
+import { createContext, useContext, useState, useEffect } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
 
-const AuthContext = createContext({})
+const AuthContext = createContext()
+
+// Rutas públicas que no requieren autenticación
+const publicRoutes = ['/', '/login', '/register', '/warranty-form']
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const [loading, setLoading] = useState(true)
   const router = useRouter()
   const pathname = usePathname()
 
-  const getCookie = (name) => {
-    const value = `; ${document.cookie}`
-    const parts = value.split(`; ${name}=`)
-    if (parts.length === 2) return parts.pop().split(';').shift()
-    return null
-  }
+  const refreshToken = async () => {
+    try {
+      const response = await fetch('/api/auth/refresh', {
+        method: 'POST',
+        credentials: 'include'
+      })
 
-  const setCookie = (name, value, days) => {
-    const date = new Date()
-    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000))
-    const expires = `expires=${date.toUTCString()}`
-    document.cookie = `${name}=${value};${expires};path=/`
-  }
+      if (!response.ok) {
+        setUser(null)
+        return false
+      }
 
-  const removeCookie = (name) => {
-    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`
+      const data = await response.json()
+      setUser(data.user)
+      return true
+    } catch (error) {
+      console.error('Error refreshing token:', error)
+      setUser(null)
+      return false
+    }
   }
 
   useEffect(() => {
-    const token = getCookie("token")
-    const storedUser = localStorage.getItem("user")
-
-    if (token && storedUser) {
+    const initAuth = async () => {
       try {
-        const parsedUser = JSON.parse(storedUser)
-        setUser(parsedUser)
-      } catch (error) {
-        console.error("Error parsing user data:", error)
-        localStorage.removeItem("user")
-        removeCookie("token")
+        // Si es una ruta pública, no necesitamos verificar la autenticación
+        if (publicRoutes.includes(pathname)) {
+          setLoading(false)
+          return
+        }
+
+        const success = await refreshToken()
+        if (!success) {
+          router.push('/login')
+        }
+      } finally {
+        setLoading(false)
       }
     }
 
-    setIsLoading(false)
-  }, [])
+    initAuth()
 
-  useEffect(() => {
-    // Si estamos en login o home, limpiar la sesión
-    if (pathname === "/login" || pathname === "/") {
-      setUser(null)
-      return
-    }
+    // Configurar refresh token periódico (cada 14 minutos)
+    const refreshInterval = setInterval(refreshToken, 14 * 60 * 1000)
+    return () => clearInterval(refreshInterval)
+  }, [pathname])
 
-    // Si estamos en una ruta protegida y no hay usuario, redirigir a login
-    if ((pathname.startsWith("/admin") || pathname.startsWith("/seller")) && !user) {
-      router.replace("/login")
-    }
-  }, [pathname, router, user])
-
-  const handleLogin = async (credentials) => {
+  const login = async (email, password) => {
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(credentials),
+        credentials: 'include',
+        body: JSON.stringify({ email, password }),
       })
 
       const data = await response.json()
 
-      if (data.success) {
-        setUser(data.user)
-        localStorage.setItem("user", JSON.stringify(data.user))
-        setCookie("token", data.token, 7)
-
-        if (data.user.role === "admin") {
-          router.replace("/admin/dashboard")
-        } else {
-          router.replace("/seller/dashboard")
-        }
-
-        return { success: true }
-      } else {
-        return { success: false, message: data.message || "Login failed" }
+      if (!response.ok) {
+        return { success: false, message: data.error }
       }
+
+      setUser(data.user)
+      return { success: true }
     } catch (error) {
-      console.error("Login error:", error)
-      return { success: false, message: "Server connection error" }
+      console.error('Login error:', error)
+      return { success: false, message: 'An error occurred during login' }
     }
   }
 
-  const handleLogout = () => {
-    setUser(null)
-    localStorage.removeItem("user")
-    removeCookie("token")
-    router.replace("/login")
+  const logout = async () => {
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      })
+      setUser(null)
+      router.push('/login')
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
+  }
+
+  if (loading) {
+    return <div>Loading...</div>
   }
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isLoading,
-        login: handleLogin,
-        logout: handleLogout,
-      }}
-    >
+    <AuthContext.Provider value={{ user, login, logout }}>
       {children}
     </AuthContext.Provider>
   )
 }
 
-export const useAuth = () => {
+export function useAuth() {
   const context = useContext(AuthContext)
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider")
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider')
   }
   return context
 }

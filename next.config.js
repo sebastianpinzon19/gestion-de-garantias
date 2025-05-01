@@ -4,15 +4,17 @@ const nextConfig = {
   
   env: {
     DATABASE_URL: process.env.DATABASE_URL,
-    APP_TITLE: 'Sistema de Gestión de Garantías'
+    JWT_SECRET: process.env.JWT_SECRET,
+    APP_TITLE: 'Warranty Management System'
   },
   
   webpack: (config) => {
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      fs: false,
-    }
-    return config
+    const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
+
+    config.plugins.push(new NodePolyfillPlugin());
+    config.externals = [...config.externals, 'bcrypt'];
+
+    return config;
   },
   
   images: {
@@ -28,10 +30,10 @@ const nextConfig = {
     ignoreDuringBuilds: true
   },
 
-  // Configuración de páginas
+  // Page configuration
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'mdx'],
   
-  // Headers de seguridad
+  // Security headers
   async headers() {
     return [
       {
@@ -58,7 +60,7 @@ const nextConfig = {
     ]
   },
 
-  // Configuración de archivos estáticos
+  // Static files configuration
   async rewrites() {
     return [
       {
@@ -80,21 +82,27 @@ const nextConfig = {
     return [
       {
         source: '/dashboard',
-        destination: '/modules/seller/pages/dashboard',
+        destination: '/dashboard',
         permanent: true,
       },
       {
         source: '/admin',
-        destination: '/modules/admin/pages/dashboard',
+        destination: '/admin/dashboard',
         permanent: true,
       },
       {
         source: '/warranty',
-        destination: '/modules/warranty/pages/formulario',
+        destination: '/warranty-form',
         permanent: true,
       },
     ]
+  },
+
+  experimental: {
+    serverActions: {
+      enabled: true
   }
+  },
 };
 
 module.exports = nextConfig;

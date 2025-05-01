@@ -1,10 +1,12 @@
 {
   "version": 2,
-  "buildCommand": "pnpm run build",
-  "installCommand": "pnpm install",
-  "framework": "nextjs",
-  "outputDirectory": ".next",
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ],
   "env": {
-    "NEXT_TELEMETRY_DISABLED": "1"
+    "NEXT_PUBLIC_API_URL": "https://gestion-de-garantias.vercel.app"
   }
 }

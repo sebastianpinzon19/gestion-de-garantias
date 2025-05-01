@@ -1,23 +1,23 @@
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
-import Providers from "@/components/providers"
+import { AuthProvider } from "@/providers/auth-provider"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
-  title: "Sistema de Gestión de Garantías",
-  description: "Sistema para gestionar garantías de productos",
+  title: "Warranty Management System",
+  description: "System for managing warranties and technical services",
 }
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="es" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <Providers>
+        <AuthProvider>
           {children}
           <Toaster />
-        </Providers>
+        </AuthProvider>
       </body>
     </html>
   )

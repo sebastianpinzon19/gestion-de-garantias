@@ -1,101 +1,73 @@
-import { NextResponse } from "next/server"
-import { PrismaClient } from "@prisma/client"
-import argon2 from "argon2"
-
-const prisma = new PrismaClient()
+import { NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
+import prisma from "@/lib/prisma";
+import { generateTokens, setTokenCookies } from "@/lib/tokens";
 
 export async function POST(request) {
   try {
-    const { email, password } = await request.json()
+    const { email, password } = await request.json();
+    console.log("[LOGIN] Login attempt:", { email });
 
-    // Demo credentials
-    if (email === "admin@example.com" && password === "admin123") {
-      const response = NextResponse.json({
-        success: true,
-        token: "demo-token-admin",
-        user: {
-          id: 1,
-          name: "Admin",
-          email: "admin@example.com",
-          role: "admin",
-        },
-      })
-
-      response.cookies.set({
-        name: "token",
-        value: "demo-token-admin",
-        httpOnly: true,
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7, // 7 days
-        sameSite: "strict",
-      })
-
-      return response
+    // Validate required fields
+    if (!email || !password) {
+      return NextResponse.json(
+        { error: "Email and password are required" },
+        { status: 400 }
+      );
     }
 
-    if (email === "seller@example.com" && password === "seller123") {
-      const response = NextResponse.json({
-        success: true,
-        token: "demo-token-seller",
-        user: {
-          id: 2,
-          name: "Seller",
-          email: "seller@example.com",
-          role: "seller",
-        },
-      })
+    // Find user by email
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        email: true,
+        password: true,
+        role: true,
+        name: true
+      }
+    });
 
-      response.cookies.set({
-        name: "token",
-        value: "demo-token-seller",
-        httpOnly: true,
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7, // 7 days
-        sameSite: "strict",
-      })
+    console.log("[LOGIN] User found:", user ? "Yes" : "No");
 
-      return response
-    }
-
-    // Login real con base de datos
-    const user = await prisma.user.findUnique({ where: { email } })
+    // Verify if user exists
     if (!user) {
       return NextResponse.json(
-        { success: false, message: "Invalid credentials" },
+        { error: "Invalid credentials" },
         { status: 401 }
-      )
+      );
     }
-    const valid = await argon2.verify(user.password, password)
-    if (!valid) {
+
+    // Verify password
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    console.log("[LOGIN] Valid password?:", isValidPassword);
+
+    if (!isValidPassword) {
       return NextResponse.json(
-        { success: false, message: "Invalid credentials" },
+        { error: "Invalid credentials" },
         { status: 401 }
-      )
+      );
     }
-    // No enviar la contraseña al frontend
-    const { password: _, ...userWithoutPassword } = user
-    const response = NextResponse.json({
-      success: true,
-      token: "real-user-token",
-      user: userWithoutPassword,
-    })
-    response.cookies.set({
-      name: "token",
-      value: "real-user-token",
-      httpOnly: true,
-      path: "/",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      sameSite: "strict",
-    })
-    return response
+
+    // Generate tokens
+    const { accessToken, refreshToken } = generateTokens(user);
+    
+    // Set cookies
+    setTokenCookies(accessToken, refreshToken);
+
+    // Return user info without password
+    const { password: _, ...userWithoutPassword } = user;
+    return NextResponse.json({
+      user: userWithoutPassword
+    });
+
   } catch (error) {
-    console.error("Login error:", error)
+    console.error("Login error:", error);
     return NextResponse.json(
-      { success: false, message: "Server error" },
+      { error: "Internal server error" },
       { status: 500 }
-    )
-  } finally {
-    await prisma.$disconnect()
+    );
   }
 }
+
 

@@ -1,4 +1,4 @@
-import { sql } from "@/lib/db"
+import { db } from "@/lib/db"
 import { NextResponse } from "next/server"
 import * as argon2 from "argon2"
 
@@ -6,17 +6,22 @@ export async function GET(request, { params }) {
   try {
     const { id } = params
 
-    const user = await sql`
-      SELECT id, name, email, role, created_at
-      FROM users
-      WHERE id = ${id}
-    `
+    const user = await db.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true
+      }
+    })
 
-    if (user.length === 0) {
+    if (!user) {
       return NextResponse.json({ success: false, message: "Usuario no encontrado" }, { status: 404 })
     }
 
-    return NextResponse.json(user[0])
+    return NextResponse.json(user)
   } catch (error) {
     console.error("Error fetching user:", error)
     return NextResponse.json({ success: false, message: "Error al obtener el usuario" }, { status: 500 })
@@ -29,21 +34,24 @@ export async function PUT(request, { params }) {
     const data = await request.json()
 
     // Verificar si el usuario existe
-    const existingUser = await sql`
-      SELECT * FROM users WHERE id = ${id}
-    `
+    const existingUser = await db.user.findUnique({
+      where: { id }
+    })
 
-    if (existingUser.length === 0) {
+    if (!existingUser) {
       return NextResponse.json({ success: false, message: "Usuario no encontrado" }, { status: 404 })
     }
 
     // Si se está actualizando el correo, verificar que no exista
-    if (data.email && data.email !== existingUser[0].email) {
-      const emailExists = await sql`
-        SELECT * FROM users WHERE email = ${data.email} AND id != ${id}
-      `
+    if (data.email && data.email !== existingUser.email) {
+      const emailExists = await db.user.findFirst({
+        where: {
+          email: data.email,
+          NOT: { id }
+        }
+      })
 
-      if (emailExists.length > 0) {
+      if (emailExists) {
         return NextResponse.json(
           { success: false, message: "El correo electrónico ya está registrado" },
           { status: 400 },
@@ -52,39 +60,33 @@ export async function PUT(request, { params }) {
     }
 
     // Preparar datos para actualizar
-    let updateQuery = `
-      UPDATE users 
-      SET 
-        name = $1, 
-        email = $2, 
-        role = $3, 
-        updated_at = CURRENT_TIMESTAMP
-    `
-
-    const updateParams = [
-      data.name || existingUser[0].name,
-      data.email || existingUser[0].email,
-      data.role || existingUser[0].role,
-    ]
+    const updateData = {
+      name: data.name || existingUser.name,
+      email: data.email || existingUser.email,
+      role: data.role || existingUser.role,
+    }
 
     // Si hay nueva contraseña, encriptarla
     if (data.password) {
-      const hashedPassword = await argon2.hash(data.password)
-      updateQuery += `, password = $4`
-      updateParams.push(hashedPassword)
+      updateData.password = await argon2.hash(data.password)
     }
 
-    // Añadir la condición WHERE
-    updateQuery += ` WHERE id = $${updateParams.length + 1} RETURNING id, name, email, role`
-    updateParams.push(id)
-
     // Ejecutar la actualización
-    const result = await sql.unsafe(updateQuery, updateParams)
+    const updatedUser = await db.user.update({
+      where: { id },
+      data: updateData,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true
+      }
+    })
 
     return NextResponse.json({
       success: true,
       message: "Usuario actualizado correctamente",
-      user: result[0],
+      user: updatedUser,
     })
   } catch (error) {
     console.error("Error updating user:", error)
@@ -97,18 +99,18 @@ export async function DELETE(request, { params }) {
     const { id } = params
 
     // Verificar si el usuario existe
-    const existingUser = await sql`
-      SELECT * FROM users WHERE id = ${id}
-    `
+    const existingUser = await db.user.findUnique({
+      where: { id }
+    })
 
-    if (existingUser.length === 0) {
+    if (!existingUser) {
       return NextResponse.json({ success: false, message: "Usuario no encontrado" }, { status: 404 })
     }
 
     // Eliminar el usuario
-    await sql`
-      DELETE FROM users WHERE id = ${id}
-    `
+    await db.user.delete({
+      where: { id }
+    })
 
     return NextResponse.json({
       success: true,

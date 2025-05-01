@@ -1,12 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -15,43 +8,51 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
+  id        String   @id @default(uuid())
   name      String
-  role      String
+  email     String   @unique
   password  String
+  role      String   @default("user")
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 model Warranty {
-  id                String   @id @default(cuid())
+  id                String    @id
   customerName      String
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime
+  address           String
+  brand             String
+  crediMemo         String?
   customerPhone     String
-  ownerName        String?
-  ownerPhone       String?
-  address          String
-  brand            String
-  model            String
-  serial           String
-  purchaseDate     DateTime
-  invoiceNumber    String
-  damagedPart      String
-  damagedPartSerial String?
-  damageDate       DateTime
-  damageDescription String
   customerSignature String
-  
-  // Seller section
-  crediMemo        String?
-  replacementPart  String?
+  damageDate        DateTime
+  damageDescription String
+  damagedPart       String
+  damagedPartSerial String?
+  invoiceNumber     String
+  managementDate    DateTime?
+  model             String
+  ownerName         String?
+  ownerPhone        String?
+  purchaseDate      DateTime
+  replacementPart   String?
   replacementSerial String?
-  sellerSignature  String?
-  managementDate   DateTime?
-  warrantyStatus   String   @default("pending")
-  technicianNotes  String?
-  resolutionDate   DateTime?
-  
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  resolutionDate    DateTime?
+  sellerSignature   String?
+  serial            String
+  technicianNotes   String?
+  warrantyStatus    String    @default("pending")
+}
+
+model MenuItem {
+  id        String   @id @default(uuid())
+  name      String
+  link      String
+  icon      String?
+  order     Int      @default(0)
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

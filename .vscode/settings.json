@@ -1,3 +1,18 @@
 {
-    "editor.wordBasedSuggestions": "matchingDocuments"
+    "editor.wordBasedSuggestions": "matchingDocuments",
+    "files.exclude": {
+        "**/.*": false
+    },
+    "search.useGlobalIgnoreFiles": true,
+    "search.exclude": {
+        "**/*.env": false,
+        "**/*.env.local": false,
+        "**/*.env.development": false,
+        "**/*.env.production": false,
+        "**/*.env.test": false,
+        "**/*.env.test.local": false,
+        "**/*.env.development.local": false,
+    },
+    "search.useParentIgnoreFiles": true
+    
 }

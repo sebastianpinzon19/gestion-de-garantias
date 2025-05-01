@@ -1,4 +1,4 @@
-import { sql } from "@/lib/db"
+import { db } from "@/lib/db"
 import { NextResponse } from "next/server"
 import { sendSellerAssignmentNotification } from "@/lib/email-service"
 
@@ -8,34 +8,38 @@ export async function POST(request, { params }) {
     const { sellerId } = await request.json()
 
     // Verificar si la garantía existe
-    const existingWarranty = await sql`
-      SELECT * FROM warranties WHERE id = ${id}
-    `
+    const existingWarranty = await db.warranty.findUnique({
+      where: { id }
+    })
 
-    if (existingWarranty.length === 0) {
+    if (!existingWarranty) {
       return NextResponse.json({ success: false, message: "Warranty not found" }, { status: 404 })
     }
 
     // Check if seller exists
-    const seller = await sql`
-      SELECT * FROM users WHERE id = ${sellerId} AND role = 'seller'
-    `
+    const seller = await db.user.findFirst({
+      where: {
+        id: sellerId,
+        role: 'SELLER'
+      }
+    })
 
-    if (seller.length === 0) {
+    if (!seller) {
       return NextResponse.json({ success: false, message: "Seller not found" }, { status: 404 })
     }
 
     // Update warranty with assigned seller
-    const updatedWarranty = await sql`
-      UPDATE warranties 
-      SET assigned_to = ${sellerId}, updated_at = CURRENT_TIMESTAMP
-      WHERE id = ${id}
-      RETURNING *
-    `
+    const updatedWarranty = await db.warranty.update({
+      where: { id },
+      data: {
+        assignedTo: sellerId,
+        updatedAt: new Date()
+      }
+    })
 
     try {
       // Send email notification to seller
-      await sendSellerAssignmentNotification(updatedWarranty[0], seller[0])
+      await sendSellerAssignmentNotification(updatedWarranty, seller)
     } catch (emailError) {
       console.error("Error sending email to seller:", emailError)
       return NextResponse.json(
@@ -47,7 +51,7 @@ export async function POST(request, { params }) {
     return NextResponse.json({
       success: true,
       message: "Warranty assigned successfully",
-      warranty: updatedWarranty[0],
+      warranty: updatedWarranty,
     })
   } catch (error) {
     console.error("Error assigning warranty:", error)
