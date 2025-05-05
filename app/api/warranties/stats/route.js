@@ -1,55 +1,29 @@
 import { NextResponse } from "next/server"
-import { PrismaClient } from "@prisma/client"
+import { verifyToken } from "@/lib/auth"
+import { getWarrantyStats } from "@/lib/warranty-service"
 
-const prisma = new PrismaClient()
-
-export async function GET() {
+export async function GET(request) {
   try {
-    const [total, pending, completed] = await Promise.all([
-      prisma.warranty.count(),
-      prisma.warranty.count({
-        where: {
-          warrantyStatus: "pending"
-        }
-      }),
-      prisma.warranty.count({
-        where: {
-          warrantyStatus: "completed"
-        }
-      })
-    ])
+    // Obtener token de la cookie
+    const token = request.cookies.get("token")?.value
 
-    const recentWarranties = await prisma.warranty.findMany({
-      take: 5,
-      orderBy: {
-        createdAt: 'desc'
-      },
-      select: {
-        id: true,
-        customerName: true,
-        brand: true,
-        model: true,
-        serial: true,
-        warrantyStatus: true,
-        createdAt: true
-      }
-    })
+    if (!token) {
+      return NextResponse.json({ success: false, message: "No autenticado" }, { status: 401 })
+    }
 
-    return NextResponse.json({
-      success: true,
-      stats: {
-        total,
-        pending,
-        completed,
-        recentWarranties
-      }
-    })
+    // Verificar token
+    const decoded = verifyToken(token)
+
+    if (!decoded || (decoded.role !== "admin" && decoded.role !== "seller")) {
+      return NextResponse.json({ success: false, message: "No autorizado" }, { status: 403 })
+    }
+
+    // Obtener estadísticas
+    const stats = await getWarrantyStats()
+
+    return NextResponse.json(stats)
   } catch (error) {
-    console.error('Error fetching warranty stats:', error.stack); // Log stack trace
-    return NextResponse.json(
-      { success: false, message: "Error al obtener las estadísticas" },
-      { status: 500 }
-    )
+    console.error("Error al obtener estadísticas:", error)
+    return NextResponse.json({ success: false, message: "Error al obtener estadísticas" }, { status: 500 })
   }
 }
-

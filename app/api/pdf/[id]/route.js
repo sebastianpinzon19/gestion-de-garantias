@@ -11,4 +11,3 @@ export async function GET(request, { params }) {
     url: `/pdf/garantia-${id}.pdf`, // URL ficticia
   })
 }
-

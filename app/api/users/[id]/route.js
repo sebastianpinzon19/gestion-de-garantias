@@ -1,94 +1,86 @@
-import { sql } from "@/lib/db"
 import { NextResponse } from "next/server"
-import * as argon2 from "argon2"
+import { verifyToken } from "@/lib/auth"
+import { getUserById, updateUser, deleteUser } from "@/lib/user-service"
 
 export async function GET(request, { params }) {
   try {
     const { id } = params
 
-    const user = await sql`
-      SELECT id, name, email, role, created_at
-      FROM users
-      WHERE id = ${id}
-    `
+    // Obtener token de la cookie
+    const token = request.cookies.get("token")?.value
 
-    if (user.length === 0) {
+    if (!token) {
+      return NextResponse.json({ success: false, message: "No autenticado" }, { status: 401 })
+    }
+
+    // Verificar token
+    const decoded = verifyToken(token)
+
+    if (!decoded) {
+      return NextResponse.json({ success: false, message: "Token inválido" }, { status: 401 })
+    }
+
+    // Solo permitir acceso al propio usuario o a administradores
+    if (decoded.id !== id && decoded.role !== "admin") {
+      return NextResponse.json({ success: false, message: "No autorizado" }, { status: 403 })
+    }
+
+    // Obtener usuario
+    const user = await getUserById(id)
+
+    if (!user) {
       return NextResponse.json({ success: false, message: "Usuario no encontrado" }, { status: 404 })
     }
 
-    return NextResponse.json(user[0])
+    return NextResponse.json(user)
   } catch (error) {
-    console.error("Error fetching user:", error)
-    return NextResponse.json({ success: false, message: "Error al obtener el usuario" }, { status: 500 })
+    console.error(`Error al obtener usuario ${params.id}:`, error)
+    return NextResponse.json({ success: false, message: "Error al obtener usuario" }, { status: 500 })
   }
 }
 
 export async function PUT(request, { params }) {
   try {
     const { id } = params
-    const data = await request.json()
 
-    // Verificar si el usuario existe
-    const existingUser = await sql`
-      SELECT * FROM users WHERE id = ${id}
-    `
+    // Obtener token de la cookie
+    const token = request.cookies.get("token")?.value
 
-    if (existingUser.length === 0) {
-      return NextResponse.json({ success: false, message: "Usuario no encontrado" }, { status: 404 })
+    if (!token) {
+      return NextResponse.json({ success: false, message: "No autenticado" }, { status: 401 })
     }
 
-    // Si se está actualizando el correo, verificar que no exista
-    if (data.email && data.email !== existingUser[0].email) {
-      const emailExists = await sql`
-        SELECT * FROM users WHERE email = ${data.email} AND id != ${id}
-      `
+    // Verificar token
+    const decoded = verifyToken(token)
 
-      if (emailExists.length > 0) {
-        return NextResponse.json(
-          { success: false, message: "El correo electrónico ya está registrado" },
-          { status: 400 },
-        )
-      }
+    if (!decoded) {
+      return NextResponse.json({ success: false, message: "Token inválido" }, { status: 401 })
     }
 
-    // Preparar datos para actualizar
-    let updateQuery = `
-      UPDATE users 
-      SET 
-        name = $1, 
-        email = $2, 
-        role = $3, 
-        updated_at = CURRENT_TIMESTAMP
-    `
-
-    const updateParams = [
-      data.name || existingUser[0].name,
-      data.email || existingUser[0].email,
-      data.role || existingUser[0].role,
-    ]
-
-    // Si hay nueva contraseña, encriptarla
-    if (data.password) {
-      const hashedPassword = await argon2.hash(data.password)
-      updateQuery += `, password = $4`
-      updateParams.push(hashedPassword)
+    // Solo permitir actualizar al propio usuario o a administradores
+    if (decoded.id !== id && decoded.role !== "admin") {
+      return NextResponse.json({ success: false, message: "No autorizado" }, { status: 403 })
     }
 
-    // Añadir la condición WHERE
-    updateQuery += ` WHERE id = $${updateParams.length + 1} RETURNING id, name, email, role`
-    updateParams.push(id)
+    // Obtener datos del usuario
+    const userData = await request.json()
 
-    // Ejecutar la actualización
-    const result = await sql.unsafe(updateQuery, updateParams)
+    // Si no es admin, no permitir cambiar el rol
+    if (decoded.role !== "admin" && userData.role) {
+      delete userData.role
+    }
 
-    return NextResponse.json({
-      success: true,
-      message: "Usuario actualizado correctamente",
-      user: result[0],
-    })
+    // Actualizar usuario
+    const result = await updateUser(id, userData)
+
+    if (!result.success) {
+      return NextResponse.json({ success: false, message: result.message }, { status: 400 })
+    }
+
+    return NextResponse.json(result)
   } catch (error) {
-    console.error("Error updating user:", error)
-    return NextResponse.json({ success: false, message: "Error al actualizar el usuario" }, { status: 500 })
+    console.error(`Error al actualizar usuario ${params.id}:`, error)
+    return NextResponse.json({ success: false, message: "Error al actualizar usuario" }, { status: 500 })
   }
 }
 
@@ -96,27 +88,30 @@ export async function DELETE(request, { params }) {
   try {
     const { id } = params
 
-    // Verificar si el usuario existe
-    const existingUser = await sql`
-      SELECT * FROM users WHERE id = ${id}
-    `
+    // Obtener token de la cookie
+    const token = request.cookies.get("token")?.value
 
-    if (existingUser.length === 0) {
-      return NextResponse.json({ success: false, message: "Usuario no encontrado" }, { status: 404 })
+    if (!token) {
+      return NextResponse.json({ success: false, message: "No autenticado" }, { status: 401 })
     }
 
-    // Eliminar el usuario
-    await sql`
-      DELETE FROM users WHERE id = ${id}
-    `
+    // Verificar token
+    const decoded = verifyToken(token)
 
-    return NextResponse.json({
-      success: true,
-      message: "Usuario eliminado correctamente",
-    })
+    if (!decoded || decoded.role !== "admin") {
+      return NextResponse.json({ success: false, message: "No autorizado" }, { status: 403 })
+    }
+
+    // Eliminar usuario
+    const result = await deleteUser(id)
+
+    if (!result.success) {
+      return NextResponse.json({ success: false, message: result.message }, { status: 400 })
+    }
+
+    return NextResponse.json(result)
   } catch (error) {
-    console.error("Error deleting user:", error)
-    return NextResponse.json({ success: false, message: "Error al eliminar el usuario" }, { status: 500 })
+    console.error(`Error al eliminar usuario ${params.id}:`, error)
+    return NextResponse.json({ success: false, message: "Error al eliminar usuario" }, { status: 500 })
   }
 }
-

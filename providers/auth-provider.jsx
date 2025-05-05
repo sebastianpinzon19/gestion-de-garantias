@@ -1,112 +1,176 @@
 "use client"
 
-import { createContext, useContext, useEffect, useState } from "react"
-import { useRouter, usePathname } from "next/navigation"
+import { createContext, useContext, useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 
-const AuthContext = createContext({})
+// Crear contexto de autenticación
+const AuthContext = createContext()
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const [loading, setLoading] = useState(true)
+  const [initialized, setInitialized] = useState(false)
   const router = useRouter()
-  const pathname = usePathname()
 
-  const getCookie = (name) => {
-    const value = `; ${document.cookie}`
-    const parts = value.split(`; ${name}=`)
-    if (parts.length === 2) return parts.pop().split(';').shift()
-    return null
-  }
-
-  const setCookie = (name, value, days) => {
-    const date = new Date()
-    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000))
-    const expires = `expires=${date.toUTCString()}`
-    document.cookie = `${name}=${value};${expires};path=/`
-  }
-
-  const removeCookie = (name) => {
-    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`
-  }
-
+  // Cargar usuario desde localStorage al iniciar
   useEffect(() => {
-    const token = getCookie("token")
-    const storedUser = localStorage.getItem("user")
-
-    if (token && storedUser) {
+    const loadUserFromStorage = () => {
       try {
-        const parsedUser = JSON.parse(storedUser)
-        setUser(parsedUser)
+        const storedUser = localStorage.getItem("user")
+        const storedToken = localStorage.getItem("token")
+
+        if (storedUser && storedToken) {
+          setUser(JSON.parse(storedUser))
+        }
       } catch (error) {
-        console.error("Error parsing user data:", error)
-        localStorage.removeItem("user")
-        removeCookie("token")
+        console.error("Error loading user from storage:", error)
+      } finally {
+        setLoading(false)
+        setInitialized(true)
       }
     }
 
-    setIsLoading(false)
+    loadUserFromStorage()
   }, [])
 
-  useEffect(() => {
-    // Si estamos en login o home, limpiar la sesión
-    if (pathname === "/login" || pathname === "/") {
-      setUser(null)
-      return
-    }
-
-    // Si estamos en una ruta protegida y no hay usuario, redirigir a login
-    if ((pathname.startsWith("/admin") || pathname.startsWith("/seller")) && !user) {
-      router.replace("/login")
-    }
-  }, [pathname, router, user])
-
-  const handleLogin = async (credentials) => {
+  // Función para iniciar sesión
+  const login = async (email, password) => {
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(credentials),
+        body: JSON.stringify({ email, password }),
       })
 
       const data = await response.json()
 
-      if (data.success) {
-        setUser(data.user)
-        localStorage.setItem("user", JSON.stringify(data.user))
-        setCookie("token", data.token, 7)
-
-        if (data.user.role === "admin") {
-          router.replace("/admin/dashboard")
-        } else {
-          router.replace("/seller/dashboard")
-        }
-
-        return { success: true }
-      } else {
-        return { success: false, message: data.message || "Login failed" }
+      if (!data.success) {
+        return { success: false, message: data.message }
       }
+
+      // Guardar datos en localStorage
+      localStorage.setItem("token", data.token)
+      localStorage.setItem("user", JSON.stringify(data.user))
+
+      // Actualizar estado
+      setUser(data.user)
+
+      // Redireccionar según el rol
+      if (data.user.role === "admin") {
+        router.push("/admin/dashboard")
+      } else if (data.user.role === "seller") {
+        router.push("/dashboard")
+      } else {
+        router.push("/")
+      }
+
+      return { success: true }
     } catch (error) {
       console.error("Login error:", error)
-      return { success: false, message: "Server connection error" }
+      return { success: false, message: "Error al iniciar sesión" }
     }
   }
 
-  const handleLogout = () => {
-    setUser(null)
-    localStorage.removeItem("user")
-    removeCookie("token")
-    router.replace("/login")
+  // Función para cerrar sesión
+  const logout = async () => {
+    try {
+      // Llamar a la API para invalidar el token
+      await fetch("/api/auth/logout", {
+        method: "POST",
+      })
+    } catch (error) {
+      console.error("Logout error:", error)
+    } finally {
+      // Limpiar localStorage
+      localStorage.removeItem("token")
+      localStorage.removeItem("user")
+
+      // Actualizar estado
+      setUser(null)
+
+      // Redireccionar a la página de inicio
+      router.push("/")
+    }
+  }
+
+  // Función para registrar un nuevo usuario
+  const register = async (userData) => {
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      })
+
+      const data = await response.json()
+
+      if (!data.success) {
+        return { success: false, message: data.message }
+      }
+
+      return { success: true, user: data.user }
+    } catch (error) {
+      console.error("Register error:", error)
+      return { success: false, message: "Error al registrar usuario" }
+    }
+  }
+
+  // Función para actualizar el perfil del usuario
+  const updateProfile = async (userData) => {
+    try {
+      const response = await fetch("/api/auth/me", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      })
+
+      const data = await response.json()
+
+      if (!data.success) {
+        return { success: false, message: data.message }
+      }
+
+      // Actualizar localStorage y estado
+      localStorage.setItem("user", JSON.stringify(data.user))
+      setUser(data.user)
+
+      return { success: true, user: data.user }
+    } catch (error) {
+      console.error("Update profile error:", error)
+      return { success: false, message: "Error al actualizar perfil" }
+    }
+  }
+
+  // Verificar si el usuario está autenticado
+  const isAuthenticated = !!user
+
+  // Verificar si el usuario tiene un rol específico
+  const hasRole = (role) => {
+    if (!user) return false
+    if (Array.isArray(role)) {
+      return role.includes(user.role)
+    }
+    return user.role === role
   }
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        isLoading,
-        login: handleLogin,
-        logout: handleLogout,
+        loading,
+        initialized,
+        login,
+        logout,
+        register,
+        updateProfile,
+        isAuthenticated,
+        hasRole,
       }}
     >
       {children}
@@ -114,11 +178,11 @@ export function AuthProvider({ children }) {
   )
 }
 
-export const useAuth = () => {
+// Hook para usar el contexto de autenticación
+export function useAuth() {
   const context = useContext(AuthContext)
   if (context === undefined) {
     throw new Error("useAuth must be used within an AuthProvider")
   }
   return context
 }
-

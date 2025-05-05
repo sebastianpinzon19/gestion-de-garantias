@@ -1,60 +1,58 @@
+import { NextResponse } from "next/server"
+import { getWarrantyById, updateWarranty } from "@/lib/warranty-service"
+import { verifyToken } from "@/lib/auth"
+
 export async function GET(request, { params }) {
-  const { id } = params
+  try {
+    const { id } = params
 
-  // En una implementación real, aquí se consultaría la base de datos
-  const garantia = {
-    id: Number.parseInt(id),
-    nombreCliente: "Juan Pérez",
-    telefonoCliente: "555-123-4567",
-    nombreDueno: "María Pérez",
-    direccionCasa: "Calle Principal #123, Ciudad",
-    telefonoDueno: "555-987-6543",
-    marcaEquipo: "FrostCool",
-    modeloEquipo: "XYZ-123",
-    serialEquipo: "FC123456789",
-    fechaCompra: "2023-01-15",
-    numeroFactura: "F-12345",
-    parteDanada: "Compresor",
-    serialParteDanada: "CP987654321",
-    fechaDano: "2023-05-10",
-    descripcionDano: "El equipo no enfría correctamente y hace un ruido extraño al encender.",
-    firmaCliente: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...",
+    // Obtener garantía
+    const result = await getWarrantyById(id)
 
-    // Sección del vendedor (puede estar vacía si aún no se ha gestionado)
-    crediMemo: id === "1001" ? "" : "CM-00" + id.substring(1),
-    parteReemplazo: id === "1001" ? "" : "Compresor Nuevo",
-    serialParteReemplazo: id === "1001" ? "" : "NCP123456789",
-    firmaVendedor: id === "1001" ? null : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...",
-    fechaGestion: id === "1001" ? "" : "2023-05-20",
-    estadoGarantia: id === "1001" ? "pendiente" : id === "1002" ? "aprobada" : "rechazada",
-    observacionesTecnico:
-      id === "1001" ? "" : "Se reemplazó el compresor dañado por uno nuevo. El equipo funciona correctamente ahora.",
-    fechaResolucion: id === "1001" ? "" : "2023-05-25",
+    if (!result.success) {
+      return NextResponse.json({ success: false, message: result.message }, { status: 404 })
+    }
+
+    return NextResponse.json(result.warranty)
+  } catch (error) {
+    console.error(`Error al obtener garantía ${params.id}:`, error)
+    return NextResponse.json({ success: false, message: "Error en el servidor" }, { status: 500 })
   }
-
-  return Response.json(garantia)
 }
 
 export async function PUT(request, { params }) {
   try {
     const { id } = params
-    const data = await request.json()
 
-    // En una implementación real, aquí se actualizaría en la base de datos
+    // Obtener token de la cookie
+    const token = request.cookies.get("token")?.value
 
-    return Response.json({
-      success: true,
-      mensaje: "Garantía actualizada correctamente",
-      garantia: { id: Number.parseInt(id), ...data },
-    })
+    // Verificar token
+    let userId = null
+    if (token) {
+      const { valid, decoded } = verifyToken(token)
+      if (valid) {
+        userId = decoded.userId
+      } else {
+        return NextResponse.json({ success: false, message: "No autorizado" }, { status: 401 })
+      }
+    } else {
+      return NextResponse.json({ success: false, message: "No autorizado" }, { status: 401 })
+    }
+
+    // Obtener datos de la garantía
+    const warrantyData = await request.json()
+
+    // Actualizar garantía
+    const result = await updateWarranty(id, warrantyData, userId)
+
+    if (!result.success) {
+      return NextResponse.json({ success: false, message: result.message }, { status: 400 })
+    }
+
+    return NextResponse.json({ success: true, warranty: result.warranty })
   } catch (error) {
-    return Response.json(
-      {
-        success: false,
-        mensaje: "Error al actualizar la garantía",
-      },
-      { status: 500 },
-    )
+    console.error(`Error al actualizar garantía ${params.id}:`, error)
+    return NextResponse.json({ success: false, message: "Error en el servidor" }, { status: 500 })
   }
 }
-

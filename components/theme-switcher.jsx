@@ -1,26 +1,31 @@
 "use client"
 
-import * as React from "react"
-import { Moon, Sun } from "lucide-react"
-import { useTheme } from "next-themes"
+import { useTheme } from "@/context/theme-context"
+import { useLanguage } from "@/context/language-context"
 import { Button } from "@/components/ui/button"
+import { Moon, Sun } from "lucide-react"
 
-export const ThemeSwitcher = () => {
-  const { theme, setTheme } = useTheme()
+export default function ThemeSwitcher() {
+  const { theme, toggleTheme } = useTheme()
+  const { t } = useLanguage()
+
+  // Función para manejar el clic y asegurar que el cambio de tema funcione
+  const handleToggleTheme = () => {
+    console.log("Cambiando tema de", theme)
+    toggleTheme()
+  }
 
   return (
     <Button
-      variant="ghost"
-      size="icon"
-      onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-      className="text-white hover:bg-white/10"
+      variant="outline"
+      size="sm"
+      onClick={handleToggleTheme}
+      className="flex items-center gap-1 bg-blue-600/20 text-white hover:bg-blue-600/30 border-blue-400/40 dark:bg-blue-800/50 dark:hover:bg-blue-700"
     >
-      <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-      <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-      <span className="sr-only">Toggle theme</span>
+      {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+      <span className="sr-only md:not-sr-only md:inline-block">
+        {theme === "light" ? t("darkMode") : t("lightMode")}
+      </span>
     </Button>
   )
 }
-
-export default ThemeSwitcher
-

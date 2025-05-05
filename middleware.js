@@ -1,53 +1,56 @@
 import { NextResponse } from "next/server"
+import { verifyToken } from "./lib/auth"
 
-export async function middleware(request) {
+// Rutas que requieren autenticación
+const protectedRoutes = ["/dashboard", "/admin"]
+
+// Rutas que requieren roles específicos
+const roleRoutes = {
+  "/admin": ["admin"],
+  "/dashboard": ["admin", "seller"],
+}
+
+export function middleware(request) {
   const { pathname } = request.nextUrl
 
-  // Rutas públicas que no requieren autenticación
-  const publicRoutes = [
-    "/",
-    "/login",
-    "/auth/login",
-    "/auth/register",
-    "/garantia/nueva",
-    "/garantia/solicitar",
-    "/garantia/form",
-    "/garantia/cliente",
-    "/warranty/new",
-    "/warranty/request",
-    "/warranty-form",
-    "/warranty"
-  ]
+  // Verificar si la ruta está protegida
+  const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route))
 
-  // Rutas de API que no requieren autenticación
-  const publicApiRoutes = [
-    "/api/auth/login",
-    "/api/auth/register",
-    "/api/warranties",
-    "/api/public"
-  ]
-
-  // Verificar si es una ruta pública o recurso estático
-  if (
-    publicRoutes.includes(pathname) ||
-    publicApiRoutes.some(route => pathname.startsWith(route)) ||
-    pathname.startsWith("/garantia/") ||
-    pathname.startsWith("/warranty/") ||
-    pathname.includes("/_next/") ||
-    pathname.includes("/favicon.ico") ||
-    pathname.includes("/images/") ||
-    pathname.includes("/api/auth/")
-  ) {
+  if (!isProtectedRoute) {
     return NextResponse.next()
   }
 
-  // Para todas las demás rutas, redirigir a login
-  return NextResponse.redirect(new URL("/login", request.url))
+  // Obtener token de la cookie
+  const token = request.cookies.get("token")?.value
+
+  // Si no hay token, redirigir al login
+  if (!token) {
+    const url = new URL("/login", request.url)
+    url.searchParams.set("redirect", pathname)
+    return NextResponse.redirect(url)
+  }
+
+  // Verificar token
+  const { valid, decoded } = verifyToken(token)
+
+  // Si el token no es válido, redirigir al login
+  if (!valid) {
+    const url = new URL("/login", request.url)
+    url.searchParams.set("redirect", pathname)
+    return NextResponse.redirect(url)
+  }
+
+  // Verificar roles para rutas específicas
+  for (const [route, roles] of Object.entries(roleRoutes)) {
+    if (pathname.startsWith(route) && !roles.includes(decoded.role)) {
+      // Si el usuario no tiene el rol requerido, redirigir a la página principal
+      return NextResponse.redirect(new URL("/", request.url))
+    }
+  }
+
+  return NextResponse.next()
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|images|public|api/public|warranty|garantia).*)",
-  ],
+  matcher: ["/dashboard/:path*", "/admin/:path*"],
 }
-
