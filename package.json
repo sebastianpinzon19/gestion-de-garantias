@@ -60,9 +60,10 @@
     "zod": "^3.24.1",
     "nodemailer": "latest",
     "@neondatabase/serverless": "latest",
+    "uuid": "latest",
     "bcryptjs": "latest",
     "jsonwebtoken": "latest",
-    "uuid": "latest"
+    "crypto": "latest"
   },
   "devDependencies": {
     "@types/node": "^22",

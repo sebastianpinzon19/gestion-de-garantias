@@ -1,56 +1,92 @@
 import { NextResponse } from "next/server"
 import { verifyToken } from "./lib/auth"
 
-// Rutas que requieren autenticación
-const protectedRoutes = ["/dashboard", "/admin"]
+// Rutas públicas que no requieren autenticación
+const publicRoutes = ["/", "/login", "/register", "/garantia/nueva"]
 
-// Rutas que requieren roles específicos
-const roleRoutes = {
-  "/admin": ["admin"],
-  "/dashboard": ["admin", "seller"],
-}
+// Rutas que requieren rol específico
+const adminRoutes = ["/admin"]
+const sellerRoutes = ["/vendedor"]
+const customerRoutes = ["/cliente"]
 
-export function middleware(request) {
+export async function middleware(request) {
+  // Obtener la ruta de la URL
   const { pathname } = request.nextUrl
 
-  // Verificar si la ruta está protegida
-  const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route))
-
-  if (!isProtectedRoute) {
+  // Permitir rutas públicas
+  if (
+    publicRoutes.includes(pathname) ||
+    pathname.startsWith("/api/auth/") ||
+    pathname.includes("/_next/") ||
+    pathname.includes("/favicon.ico") ||
+    pathname.includes("/images/") ||
+    pathname.includes("/fonts/")
+  ) {
     return NextResponse.next()
   }
 
-  // Obtener token de la cookie
+  // Verificar token en cookies
   const token = request.cookies.get("token")?.value
 
-  // Si no hay token, redirigir al login
+  // Si no hay token y se intenta acceder a una ruta protegida, redirigir a login
   if (!token) {
-    const url = new URL("/login", request.url)
-    url.searchParams.set("redirect", pathname)
-    return NextResponse.redirect(url)
+    return NextResponse.redirect(new URL("/login", request.url))
   }
 
-  // Verificar token
-  const { valid, decoded } = verifyToken(token)
+  try {
+    // Verificar token
+    const { valid, decoded, error } = verifyToken(token)
 
-  // Si el token no es válido, redirigir al login
-  if (!valid) {
-    const url = new URL("/login", request.url)
-    url.searchParams.set("redirect", pathname)
-    return NextResponse.redirect(url)
-  }
-
-  // Verificar roles para rutas específicas
-  for (const [route, roles] of Object.entries(roleRoutes)) {
-    if (pathname.startsWith(route) && !roles.includes(decoded.role)) {
-      // Si el usuario no tiene el rol requerido, redirigir a la página principal
-      return NextResponse.redirect(new URL("/", request.url))
+    if (!valid) {
+      // Token inválido, redirigir a login
+      const response = NextResponse.redirect(new URL("/login", request.url))
+      response.cookies.delete("token")
+      response.cookies.delete("refreshToken")
+      return response
     }
-  }
 
-  return NextResponse.next()
+    // Verificar permisos según rol
+    if (pathname.startsWith("/admin") && decoded.role !== "admin") {
+      // Redirigir según rol
+      if (decoded.role === "seller") {
+        return NextResponse.redirect(new URL("/vendedor", request.url))
+      } else {
+        return NextResponse.redirect(new URL("/cliente", request.url))
+      }
+    }
+
+    if (pathname.startsWith("/vendedor") && decoded.role !== "seller") {
+      // Redirigir según rol
+      if (decoded.role === "admin") {
+        return NextResponse.redirect(new URL("/admin", request.url))
+      } else {
+        return NextResponse.redirect(new URL("/cliente", request.url))
+      }
+    }
+
+    if (pathname.startsWith("/cliente") && decoded.role !== "customer") {
+      // Redirigir según rol
+      if (decoded.role === "admin") {
+        return NextResponse.redirect(new URL("/admin", request.url))
+      } else {
+        return NextResponse.redirect(new URL("/vendedor", request.url))
+      }
+    }
+
+    // Permitir acceso
+    return NextResponse.next()
+  } catch (error) {
+    console.error("Error en middleware:", error)
+
+    // Limpiar el token inválido y redirigir a login
+    const response = NextResponse.redirect(new URL("/login", request.url))
+    response.cookies.delete("token")
+    response.cookies.delete("refreshToken")
+    return response
+  }
 }
 
+// Configurar las rutas que deben ser procesadas por el middleware
 export const config = {
-  matcher: ["/dashboard/:path*", "/admin/:path*"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|images|fonts).*)"],
 }
