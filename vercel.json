@@ -1,5 +1,8 @@
 {
   "version": 2,
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "framework": "nextjs",
   "builds": [
     {
       "src": "package.json",
@@ -8,5 +11,5 @@
   ],
   "env": {
     "NEXT_PUBLIC_API_URL": "https://gestion-de-garantias.vercel.app"
-  }
+    }
 }

@@ -1,7 +1,9 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
+import { createContext, useContext, useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { removeTokenCookie as clearToken } from '@/lib/tokens'; // Removed verifyToken import
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 const AuthContext = createContext()
 
@@ -11,106 +13,124 @@ const publicRoutes = ['/', '/login', '/register', '/warranty-form']
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const router = useRouter()
-  const pathname = usePathname()
-
-  const refreshToken = async () => {
-    try {
-      const response = await fetch('/api/auth/refresh', {
-        method: 'POST',
-        credentials: 'include'
-      })
-
-      if (!response.ok) {
-        setUser(null)
-        return false
-      }
-
-      const data = await response.json()
-      setUser(data.user)
-      return true
-    } catch (error) {
-      console.error('Error refreshing token:', error)
-      setUser(null)
-      return false
-    }
-  }
 
   useEffect(() => {
-    const initAuth = async () => {
+    const initializeAuth = async () => {
+      setLoading(true);
       try {
-        // Si es una ruta pública, no necesitamos verificar la autenticación
-        if (publicRoutes.includes(pathname)) {
-          setLoading(false)
-          return
+        // Fetch user profile from the server-side endpoint
+        const response = await fetch('/api/profile');
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.user) {
+            setUser(data.user);
+          } else {
+            setUser(null);
+            // Optional: clear token if server says user is null but cookie exists?
+            // clearToken(); 
+          }
+        } else {
+          // Handle non-200 responses, e.g., 401 Unauthorized or 500 Server Error
+          console.error('Failed to fetch profile:', response.status);
+          setUser(null);
+          clearToken(); // Clear token if profile fetch fails significantly
         }
-
-        const success = await refreshToken()
-        if (!success) {
-          router.push('/login')
-        }
+      } catch (err) {
+        console.error('Error initializing auth:', err);
+        setUser(null);
+        clearToken();
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    initAuth()
-
-    // Configurar refresh token periódico (cada 14 minutos)
-    const refreshInterval = setInterval(refreshToken, 14 * 60 * 1000)
-    return () => clearInterval(refreshInterval)
-  }, [pathname])
+    initializeAuth();
+  }, []); // Dependency array is empty, runs once on mount
 
   const login = async (email, password) => {
     try {
+      setLoading(true)
+      setError(null)
+
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include',
         body: JSON.stringify({ email, password }),
       })
 
       const data = await response.json()
 
       if (!response.ok) {
-        return { success: false, message: data.error }
+        throw new Error(data.message || 'Login failed')
       }
 
-      setUser(data.user)
-      return { success: true }
-    } catch (error) {
-      console.error('Login error:', error)
-      return { success: false, message: 'An error occurred during login' }
+      if (!data.success || !data.user) { // Check for user data as well
+        throw new Error(data.message || 'Login failed');
+      }
+
+      // Set user state after successful login
+      setUser(data.user);
+      setLoading(false);
+      
+      // Redirect based on role
+      if (data.user.role === 'ADMIN') {
+        router.push('/admin/dashboard');
+      } else if (data.user.role === 'SELLER') {
+        router.push('/seller/dashboard'); // Example seller dashboard route
+      } // Removed default redirect to profile
+      
+      return { success: true, user: data.user };
+
+    } catch (err) {
+      console.error('Login error:', err)
+      setError(err.message)
+      return { success: false, message: err.message }
+    } finally {
+      setLoading(false)
     }
   }
 
   const logout = async () => {
     try {
-      await fetch('/api/auth/logout', {
-        method: 'POST',
-        credentials: 'include',
-      })
+      setLoading(true)
+      await fetch('/api/auth/logout', { method: 'POST' })
+      clearToken()
       setUser(null)
       router.push('/login')
-    } catch (error) {
-      console.error('Logout error:', error)
+    } catch (err) {
+      console.error('Logout error:', err)
+      setError(err.message)
+    } finally {
+      setLoading(false)
     }
   }
 
   if (loading) {
-    return <div>Loading...</div>
+    return <LoadingSpinner />
+  }
+
+  const value = {
+    user,
+    loading,
+    error,
+    login,
+    logout,
+    setError
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   )
 }
 
-export function useAuth() {
+export const useAuth = () => {
   const context = useContext(AuthContext)
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider')

@@ -6,8 +6,8 @@ test('admin login flow', async ({ page }) => {
   await page.goto('http://localhost:3000/login');
 
   // Rellena el formulario de login
-  await page.fill('input[name="email"]', 'admin@example.com'); // Cambia por el email real de tu admin
-  await page.fill('input[name="password"]', 'admin123'); // Cambia por la contraseña real
+  await page.fill('input[name="email"]', 'admin@warranty.com'); // Cambia por el email real de tu admin
+  await page.fill('input[name="password"]', '123456'); // Cambia por la contraseña real
 
   // Envía el formulario
   await page.click('button[type="submit"]');

@@ -1,4 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
+const { v4: uuidv4 } = require('uuid');
+const bcrypt = require('bcryptjs');
 const prisma = new PrismaClient();
 
 async function main() {
@@ -29,7 +31,31 @@ async function main() {
       },
     });
 
+    const sellerUser = await prisma.user.create({
+      data: {
+        email: 'vendedor@warranty.com',
+        name: 'Vendedor User',
+        role: 'vendedor',
+        password: '$2b$10$K7L1OJ45/4Y2nIvhRVpCe.FSmhDdWoXehVzJptJ/op0lSsvqNuWkW', // 123456
+      },
+    });
+
     console.log('👥 Usuarios creados');
+
+    // Crear nuevo usuario administrador Sebastian Pinzon
+    const sebastianPassword = await bcrypt.hash('password123', 10); // Contraseña temporal, ¡cambiar después!
+    const sebastianAdmin = await prisma.user.create({
+      data: {
+        id: uuidv4(),
+        email: 'sebastian.pinzon.3954@gmail.com',
+        name: 'Sebastian Pinzon',
+        password: sebastianPassword,
+        role: 'admin',
+        updatedAt: new Date(),
+      },
+    });
+
+    console.log('Nuevo usuario administrador Sebastian Pinzon creado:', sebastianAdmin);
 
     const now = new Date();
 
@@ -89,7 +115,9 @@ async function main() {
         { id: 'menu_4', name: 'Reports', link: '/reports', icon: 'reports', order: 4, role: 'admin' },
         { id: 'menu_5', name: 'Dashboard', link: '/dashboard', icon: 'dashboard', order: 1, role: 'technician' },
         { id: 'menu_6', name: 'Warranties', link: '/warranties', icon: 'warranty', order: 2, role: 'technician' },
-        { id: 'menu_7', name: 'My Tasks', link: '/tasks', icon: 'tasks', order: 3, role: 'technician' }
+        { id: 'menu_7', name: 'My Tasks', link: '/tasks', icon: 'tasks', order: 3, role: 'technician' },
+        { id: 'menu_8', name: 'Dashboard', link: '/seller/dashboard', icon: 'dashboard', order: 1, role: 'vendedor' },
+        { id: 'menu_9', name: 'Warranties', link: '/seller/warranties', icon: 'warranty', order: 2, role: 'vendedor' }
       ],
   });
 

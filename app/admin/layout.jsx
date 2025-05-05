@@ -10,7 +10,8 @@ import {
   CogIcon,
   ChartBarIcon,
   ShieldCheckIcon,
-  ArrowLeftOnRectangleIcon
+  ArrowLeftOnRectangleIcon,
+  UserCircleIcon // Importar el icono de perfil
 } from '@heroicons/react/24/outline';
 
 const defaultMenuItems = [
@@ -18,6 +19,7 @@ const defaultMenuItems = [
   { id: 'menu_2', name: 'Users', link: '/admin/users', icon: 'users', order: 2 },
   { id: 'menu_3', name: 'Warranties', link: '/admin/warranties', icon: 'warranty', order: 3 },
   { id: 'menu_4', name: 'Reports', link: '/admin/reports', icon: 'analytics', order: 4 },
+  { id: 'menu_profile', name: 'Profile', link: '/profile', icon: 'profile', order: 5 }, // Añadir enlace de perfil
 ];
 
 const iconMap = {
@@ -27,6 +29,7 @@ const iconMap = {
   'analytics': ChartBarIcon,
   'settings': CogIcon,
   'documents': DocumentTextIcon,
+  'profile': UserCircleIcon, // Mapear el icono de perfil
 };
 
 export default function AdminLayout({ children }) {
@@ -101,8 +104,8 @@ export default function AdminLayout({ children }) {
             })}
           </nav>
 
-          {/* Footer */}
-          <div className="p-4 border-t dark:border-gray-700">
+          {/* Footer - Logout movido a la página de perfil */}
+          {/* <div className="p-4 border-t dark:border-gray-700">
             <button
               onClick={logout}
               className="w-full flex items-center space-x-3 px-4 py-3 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 rounded-lg transition-colors"
@@ -110,7 +113,7 @@ export default function AdminLayout({ children }) {
               <ArrowLeftOnRectangleIcon className="w-5 h-5" />
               <span>Logout</span>
             </button>
-          </div>
+          </div> */}
         </div>
       </aside>
 
@@ -122,4 +125,4 @@ export default function AdminLayout({ children }) {
       </main>
     </div>
   );
-} 
+}

@@ -11,7 +11,8 @@ import {
   ShieldCheckIcon,
   DocumentPlusIcon,
   ClipboardDocumentCheckIcon,
-  UserIcon
+  UserIcon,
+  UserCircleIcon // Importar el icono de perfil correcto
 } from '@heroicons/react/24/outline';
 
 const iconMap = {
@@ -23,7 +24,7 @@ const iconMap = {
   'warranty': ShieldCheckIcon,
   'new-warranty': DocumentPlusIcon,
   'pending': ClipboardDocumentCheckIcon,
-  'profile': UserIcon
+  'profile': UserCircleIcon // Usar el icono correcto
 };
 
 export default function Sidebar({ menuItems, error }) {
@@ -33,7 +34,9 @@ export default function Sidebar({ menuItems, error }) {
 
   useEffect(() => {
     const path = window.location.pathname;
-    const currentItem = menuItems.find(item => item.link === path);
+    // Incluir el enlace de perfil en la búsqueda del item activo
+    const finalMenuItems = menuItems ? [...menuItems, { id: 'menu_profile', name: 'Profile', link: '/profile', icon: 'profile', order: 99 }] : [{ id: 'menu_profile', name: 'Profile', link: '/profile', icon: 'profile', order: 99 }];
+    const currentItem = finalMenuItems.find(item => item.link === path);
     setActiveItem(currentItem?.id);
     
     const userData = JSON.parse(localStorage.getItem('user') || '{}');
@@ -62,7 +65,10 @@ export default function Sidebar({ menuItems, error }) {
         {error ? (
           <div className="text-red-500 text-sm bg-red-100/10 p-3 rounded">{error}</div>
         ) : (
-          menuItems.map((item) => {
+          // Añadir el enlace de perfil a los items del menú
+          (menuItems ? [...menuItems, { id: 'menu_profile', name: 'Profile', link: '/profile', icon: 'profile', order: 99 }] : [{ id: 'menu_profile', name: 'Profile', link: '/profile', icon: 'profile', order: 99 }])
+          .sort((a, b) => (a.order || 99) - (b.order || 99)) // Ordenar items
+          .map((item) => {
             const IconComponent = iconMap[item.icon] || ShieldCheckIcon;
             return (
               <button
@@ -89,13 +95,14 @@ export default function Sidebar({ menuItems, error }) {
             <p className="font-medium">{user.name}</p>
           </div>
         )}
-        <button
+        {/* Botón de Logout movido a la página de perfil */}
+        {/* <button
           onClick={handleLogout}
           className="w-full flex items-center justify-center space-x-2 text-red-400 hover:text-red-300 px-3 py-2 rounded-lg transition-colors duration-200"
         >
           <span className="font-medium">Logout</span>
-        </button>
+        </button> */}
       </div>
     </aside>
   );
-} 
+}

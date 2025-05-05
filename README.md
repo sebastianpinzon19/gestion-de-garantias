@@ -1,77 +1,45 @@
-# Warranty Management System
+# Warranty Management System (v0)
 
-Warranty management system for a US-based company, developed with Next.js, PostgreSQL, and Prisma.
+A comprehensive warranty management system built with Next.js 14, designed for US-based companies. The system is fully implemented in English and includes all necessary features for warranty tracking, customer management, and administrative functions.
 
-## Getting Started
+## Tech Stack
 
-### 1. Instalar dependencias
-```
-npm install
-```
+- **Frontend**: Next.js 14, React 18, TypeScript
+- **Styling**: Tailwind CSS, Radix UI Components
+- **Database**: Neon (Serverless PostgreSQL)
+- **Authentication**: JWT, bcrypt
+- **Email**: SendGrid
+- **PDF Generation**: @react-pdf/renderer
+- **Deployment**: Vercel
 
-### 2. Configurar variables de entorno
-Copia `.env.example` a `.env.local` y completa los valores.
+## Key Features
 
-### 3. Migrar la base de datos
-Para desarrollo local o Neon:
-```
-npm run db:migrate
-```
+1. **Authentication System**
+   - JWT-based authentication
+   - Role-based access control (Admin, User)
+   - Secure password hashing with bcrypt
+   - Session management
 
-### 4. Ejecutar el servidor
-```
-npm run dev
-```
+2. **Warranty Management**
+   - Create and track warranty claims
+   - Document upload and management
+   - Status tracking
+   - PDF generation for warranty documents
 
-### 5. Ejecutar pruebas E2E
-```
-npm run test:e2e
-```
+3. **User Management**
+   - User registration and profile management
+   - Role-based permissions
+   - User activity logging
 
-### 6. CI/CD y Previews
-El workflow `.github/workflows/pr-neon-db.yml` crea una base Neon temporal por PR, corre migraciones y tests automáticamente.
+4. **Email Notifications**
+   - Automated email notifications
+   - Status updates
+   - Document sharing
 
-- Asegúrate de tener los secrets `NEON_PROJECT_ID` y `NEON_API_KEY` en GitHub.
-- Puedes agregar deploy previews usando la variable `DATABASE_URL` generada por Neon.
-
-## Main Features
-
-- **User Authentication**
-  - JWT login
-  - Roles: Admin and Seller
-  - Route protection by role
-
-- **Admin Panel**
-  - Dashboard with statistics
-  - User management
-  - Warranty management
-  - Analysis and reporting
-  - System configuration
-
-- **Seller Panel**
-  - Custom dashboard
-  - Warranty management
-  - Create new warranties
-  - Track pending warranties
-  - User profile
-
-## Technologies Used
-
-- **Frontend**
-  - Next.js 14+
-  - React
-  - Tailwind CSS
-  - Heroicons
-
-- **Backend**
-  - Next.js API Routes
-  - Prisma ORM
-  - PostgreSQL
-  - JWT authentication
-
-- **Database**
-  - PostgreSQL
-  - Prisma ORM
+5. **Admin Dashboard**
+   - Comprehensive analytics
+   - User management
+   - System configuration
 
 ## Project Structure
 
@@ -131,38 +99,149 @@ public/                    # Static files
 - createdAt: DateTime
 - updatedAt: DateTime
 
-## Environment Setup
+## Form Fields
 
-1. Create a `.env.local` file:
+### Customer Warranty Form
+Fields filled by the customer:
+
+1. **Personal Information**
+   - Full Name (required)
+   - Email Address (required)
+   - Phone Number (required)
+   - Address (required)
+   - City (required)
+   - State (required)
+   - ZIP Code (required)
+   - Country (required)
+
+2. **Product Information**
+   - Product Brand (required)
+   - Product Model (required)
+   - Serial Number (required)
+   - Purchase Date (required)
+   - Purchase Location (required)
+   - Purchase Receipt (file upload)
+
+3. **Warranty Claim Details**
+   - Issue Description (required)
+   - Issue Date (required)
+   - Issue Photos (file upload, multiple)
+   - Additional Comments
+
+4. **Digital Signature**
+   - Customer Signature (required)
+   - Date Signed (auto-filled)
+
+### Admin/Seller Form Fields
+Fields filled by system users (Admin/Seller):
+
+1. **Warranty Processing**
+   - Claim Status (dropdown)
+     - Pending
+     - In Review
+     - Approved
+     - Rejected
+     - Completed
+   - Processing Notes
+   - Internal Reference Number
+   - Assigned Technician
+   - Priority Level
+     - Low
+     - Medium
+     - High
+     - Urgent
+
+2. **Technical Assessment**
+   - Technical Diagnosis
+   - Required Repairs
+   - Parts Needed
+   - Estimated Repair Time
+   - Repair Cost Estimate
+   - Warranty Coverage Status
+     - Covered
+     - Not Covered
+     - Partial Coverage
+
+3. **Resolution Details**
+   - Resolution Date
+   - Resolution Type
+     - Repair
+     - Replacement
+     - Refund
+   - Resolution Notes
+   - Follow-up Required
+   - Follow-up Date
+
+4. **Documentation**
+   - Technician Report (file upload)
+   - Repair Photos (file upload)
+   - Replacement Authorization (file upload)
+   - Final Report (file upload)
+
+5. **Communication Log**
+   - Customer Contact Date
+   - Contact Method
+   - Contact Summary
+   - Next Steps
+   - Follow-up Required
+
+## Environment Variables
+
+Create a `.env` file with the following variables:
+
 ```env
-DATABASE_URL=postgresql://postgres:your_password@localhost:5432/warranty_system?schema=public
-JWT_SECRET=your_jwt_secret
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=your_nextauth_secret
+# Database (Neon)
+DATABASE_URL="your-neon-database-url"
+
+# Authentication
+JWT_SECRET="your-jwt-secret-key"
+JWT_EXPIRES_IN="24h"
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your-nextauth-secret"
+
+# Email (SendGrid)
+SENDGRID_API_KEY="your-sendgrid-api-key"
+EMAIL_FROM="noreply@yourdomain.com"
+
+# Application
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+NODE_ENV="development"
 PORT=3000
 ```
 
+## Database Setup (Neon)
+
+1. Create a Neon database instance
+2. Get your connection string from the Neon dashboard
+3. Configure Neon for optimal performance:
+   - Enable connection pooling
+   - Set up automatic scaling
+   - Configure read replicas if needed
+4. Run Prisma migrations:
+```bash
+npx prisma migrate dev
+```
+5. Seed the database:
+```bash
+npx prisma db seed
+```
+
+## Development Setup
+
+1. Clone the repository
 2. Install dependencies:
 ```bash
 npm install
 ```
-
 3. Generate Prisma client:
 ```bash
 npx prisma generate
 ```
-
-4. Run the development server:
+4. Set up environment variables
+5. Start development server:
 ```bash
 npm run dev
 ```
-
-## Security
-
-- JWT authentication
-- Role-based route protection
-- Password encryption (bcrypt)
-- Token validation
 
 ## API Endpoints
 
@@ -181,13 +260,56 @@ npm run dev
   - Seller menu
   - Requires valid JWT token
 
-## Deployment
+## Production Deployment (Vercel)
 
-The project is ready for deployment on Vercel:
-1. Connect your repository to Vercel
-2. Set environment variables
-3. Deploy automatically
+1. Push code to GitHub repository
+2. Connect repository to Vercel
+3. Configure environment variables in Vercel dashboard:
+   - Add your Neon database URL
+   - Add JWT secret
+   - Add SendGrid API key
+   - Set NODE_ENV to "production"
+4. Configure Neon for production:
+   - Set up connection pooling
+   - Configure automatic scaling
+   - Set up monitoring
+5. Deploy
+
+## Security Considerations
+
+- All passwords are hashed using bcrypt
+- JWT tokens are used for authentication
+- CORS is properly configured
+- Input validation on all forms
+- Rate limiting implemented
+- Secure headers configured
+- Neon-specific security:
+  - Connection pooling for better security
+  - Automatic scaling for DDoS protection
+  - Built-in backup and recovery
+
+## API Documentation
+
+The API is documented using Swagger. Access the documentation at:
+```
+/api/docs
+```
+
+## Testing
+
+Run tests with:
+```bash
+npm test
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit changes
+4. Push to the branch
+5. Create a Pull Request
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+MIT License - See LICENSE file for details

@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
-import { verifyAccessToken } from './lib/tokens';
+import { verifyToken } from './lib/tokens';
 
 // Rutas que requieren autenticación
 const protectedRoutes = ['/admin', '/seller'];
 
 // Rutas públicas que no necesitan autenticación
-const publicRoutes = ['/', '/login', '/register', '/api/auth/refresh'];
+const publicRoutes = ['/', '/login', '/register', '/warranty-form'];
 
-export async function middleware(request) {
+export function middleware(request) {
   const { pathname } = request.nextUrl;
 
   // Permitir rutas públicas
@@ -29,16 +29,9 @@ export async function middleware(request) {
 
   try {
     // Verificar el token
-    const payload = await verifyAccessToken(token);
+    const payload = verifyToken(token);
     
     if (!payload) {
-      // Si el token no es válido, intentar usar el refresh token
-      if (pathname.startsWith('/api/')) {
-        return NextResponse.json(
-          { error: 'Token expired' },
-          { status: 401 }
-        );
-      }
       return NextResponse.redirect(new URL('/login', request.url));
     }
 

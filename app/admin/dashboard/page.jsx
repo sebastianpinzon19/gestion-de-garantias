@@ -9,8 +9,12 @@ export default function AdminDashboard() {
   const router = useRouter()
 
   useEffect(() => {
-    if (!loading && (!user || user.role !== 'ADMIN')) {
+    if (!loading) {
+      console.log('Dashboard - User:', user)
+      if (!user || user.role !== 'admin') {
+        console.log('Not admin, redirecting to login...')
       router.push('/login')
+      }
     }
   }, [user, loading, router])
 
@@ -28,7 +32,7 @@ export default function AdminDashboard() {
     )
   }
 
-  if (!user || user.role !== 'ADMIN') {
+  if (!user || user.role !== 'admin') {
     return null
   }
 

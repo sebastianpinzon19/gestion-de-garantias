@@ -1,47 +1,42 @@
 import React, { useRef, useState } from "react";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import WarrantyClaimPDF from "./WarrantyClaimPDF";
+import { toast } from "react-hot-toast";
 
 const initialForm = {
-  company: "",
-  contact: "",
+  customerName: "",
   address: "",
-  phone: "",
-  city: "",
-  state: "",
-  zip: "",
-  homeowner: "",
-  homeownerPhone: "",
-  homeownerAddress: "",
-  homeownerCity: "",
-  homeownerState: "",
-  homeownerZip: "",
-  item: "",
+  customerPhone: "",
+  customerSignature: "",
+  damageDate: "",
+  damageDescription: "",
+  damagedPart: "",
+  damagedPartSerial: "",
+  invoiceNumber: "",
   model: "",
+  ownerName: "",
+  ownerPhone: "",
+  purchaseDate: "",
+  replacementPart: "",
+  replacementSerial: "",
   serial: "",
-  brand: "",
-  dateInstalled: "",
-  reason: "",
-  signature: "",
-  failedPart: "",
-  newPart: "",
-  cmFailedPart: "",
-  soReplPart: "",
-  failedPartSerial: "",
-  newPartSerial: "",
-  unitSO: "",
-  requestReceivedBy: "",
-  receivedOn: "",
+  sellerSignature: "",
+  technicianNotes: "",
 };
 
 export default function WarrantyClaimForm() {
   const [form, setForm] = useState(initialForm);
   const [logo, setLogo] = useState("/logo empresa.png");
   const [logoFile, setLogoFile] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef();
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleLogoChange = (e) => {
@@ -49,12 +44,48 @@ export default function WarrantyClaimForm() {
     if (file) {
       setLogoFile(file);
       const reader = new FileReader();
-      reader.onload = (ev) => setLogo(ev.target.result);
+      reader.onloadend = () => {
+        setLogo(reader.result);
+      };
       reader.readAsDataURL(file);
     }
   };
 
   const handleLogoClick = () => fileInputRef.current.click();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('/api/garantias', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...form,
+          id: crypto.randomUUID(),
+          damageDate: new Date(form.damageDate),
+          purchaseDate: new Date(form.purchaseDate),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al crear la garantía');
+      }
+
+      toast.success('Garantía creada exitosamente');
+      setForm(initialForm);
+    } catch (error) {
+      console.error('Error submitting warranty:', error);
+      toast.error(error.message || 'Error al crear la garantía');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="max-w-3xl mx-auto bg-white p-6 rounded shadow mt-8">
@@ -79,66 +110,64 @@ export default function WarrantyClaimForm() {
         </div>
         <span className="text-xs text-gray-500">Click the logo to change</span>
       </div>
-      <form className="space-y-8">
-        {/* Company Detail */}
+      <form id="warranty-form" onSubmit={handleSubmit} className="space-y-8">
+        {/* Customer Information */}
         <section>
-          <h2 className="font-bold text-lg mb-2">Company Detail</h2>
+          <h2 className="font-bold text-lg mb-2">Customer Information</h2>
           <div className="grid grid-cols-2 gap-4">
-            <input name="company" value={form.company} onChange={handleChange} placeholder="Company" className="input" />
-            <input name="contact" value={form.contact} onChange={handleChange} placeholder="Contact" className="input" />
-            <input name="address" value={form.address} onChange={handleChange} placeholder="Address" className="input" />
-            <input name="phone" value={form.phone} onChange={handleChange} placeholder="Phone" className="input" />
-            <input name="city" value={form.city} onChange={handleChange} placeholder="City" className="input" />
-            <input name="state" value={form.state} onChange={handleChange} placeholder="State" className="input" />
-            <input name="zip" value={form.zip} onChange={handleChange} placeholder="Zip" className="input" />
+            <input name="customerName" value={form.customerName} onChange={handleChange} placeholder="Customer Name" className="input" required />
+            <input name="customerPhone" value={form.customerPhone} onChange={handleChange} placeholder="Customer Phone" className="input" required />
+            <input name="address" value={form.address} onChange={handleChange} placeholder="Address" className="input" required />
+            <input name="customerSignature" value={form.customerSignature} onChange={handleChange} placeholder="Customer Signature" className="input" required />
           </div>
         </section>
-        {/* Homeowner Detail */}
+
+        {/* Product Information */}
         <section>
-          <h2 className="font-bold text-lg mb-2">Homeowner Detail</h2>
+          <h2 className="font-bold text-lg mb-2">Product Information</h2>
           <div className="grid grid-cols-2 gap-4">
-            <input name="homeowner" value={form.homeowner} onChange={handleChange} placeholder="Name" className="input" />
-            <input name="homeownerPhone" value={form.homeownerPhone} onChange={handleChange} placeholder="Phone" className="input" />
-            <input name="homeownerAddress" value={form.homeownerAddress} onChange={handleChange} placeholder="Address" className="input" />
-            <input name="homeownerCity" value={form.homeownerCity} onChange={handleChange} placeholder="City" className="input" />
-            <input name="homeownerState" value={form.homeownerState} onChange={handleChange} placeholder="State" className="input" />
-            <input name="homeownerZip" value={form.homeownerZip} onChange={handleChange} placeholder="Zip" className="input" />
+            <input name="model" value={form.model} onChange={handleChange} placeholder="Model" className="input" required />
+            <input name="serial" value={form.serial} onChange={handleChange} placeholder="Serial Number" className="input" required />
+            <input name="invoiceNumber" value={form.invoiceNumber} onChange={handleChange} placeholder="Invoice Number" className="input" required />
+            <input name="purchaseDate" value={form.purchaseDate} onChange={handleChange} type="date" className="input" required />
           </div>
         </section>
-        {/* Product Detail */}
+
+        {/* Damage Information */}
         <section>
-          <h2 className="font-bold text-lg mb-2">Product Detail</h2>
+          <h2 className="font-bold text-lg mb-2">Damage Information</h2>
           <div className="grid grid-cols-2 gap-4">
-            <input name="item" value={form.item} onChange={handleChange} placeholder="Item" className="input" />
-            <input name="model" value={form.model} onChange={handleChange} placeholder="Model" className="input" />
-            <input name="serial" value={form.serial} onChange={handleChange} placeholder="Serial #" className="input" />
-            <input name="brand" value={form.brand} onChange={handleChange} placeholder="Brand" className="input" />
-            <input name="dateInstalled" value={form.dateInstalled} onChange={handleChange} placeholder="Date Installed" className="input" type="date" />
-            <input name="reason" value={form.reason} onChange={handleChange} placeholder="Reason of Warranty" className="input" />
-            <input name="signature" value={form.signature} onChange={handleChange} placeholder="Signature" className="input" />
+            <input name="damageDate" value={form.damageDate} onChange={handleChange} type="date" className="input" required />
+            <input name="damagedPart" value={form.damagedPart} onChange={handleChange} placeholder="Damaged Part" className="input" required />
+            <input name="damagedPartSerial" value={form.damagedPartSerial} onChange={handleChange} placeholder="Damaged Part Serial" className="input" />
+            <input name="damageDescription" value={form.damageDescription} onChange={handleChange} placeholder="Damage Description" className="input" required />
           </div>
         </section>
-        {/* For internal use only */}
+
+        {/* Replacement Information */}
         <section>
-          <h2 className="font-bold text-lg mb-2">For internal use only</h2>
+          <h2 className="font-bold text-lg mb-2">Replacement Information</h2>
           <div className="grid grid-cols-2 gap-4">
-            <input name="failedPart" value={form.failedPart} onChange={handleChange} placeholder="Failed Part #" className="input" />
-            <input name="newPart" value={form.newPart} onChange={handleChange} placeholder="New Part #" className="input" />
-            <input name="cmFailedPart" value={form.cmFailedPart} onChange={handleChange} placeholder="CM # Failed Part" className="input" />
-            <input name="soReplPart" value={form.soReplPart} onChange={handleChange} placeholder="SO # Repl Part" className="input" />
-            <input name="failedPartSerial" value={form.failedPartSerial} onChange={handleChange} placeholder="Failed Part Serial #" className="input" />
-            <input name="newPartSerial" value={form.newPartSerial} onChange={handleChange} placeholder="New Part Serial #" className="input" />
-            <input name="unitSO" value={form.unitSO} onChange={handleChange} placeholder="Unit SO#" className="input" />
-            <input name="requestReceivedBy" value={form.requestReceivedBy} onChange={handleChange} placeholder="Request Received by" className="input" />
-            <input name="receivedOn" value={form.receivedOn} onChange={handleChange} placeholder="Received on" className="input" type="date" />
+            <input name="replacementPart" value={form.replacementPart} onChange={handleChange} placeholder="Replacement Part" className="input" />
+            <input name="replacementSerial" value={form.replacementSerial} onChange={handleChange} placeholder="Replacement Serial" className="input" />
+            <input name="technicianNotes" value={form.technicianNotes} onChange={handleChange} placeholder="Technician Notes" className="input" />
+            <input name="sellerSignature" value={form.sellerSignature} onChange={handleChange} placeholder="Seller Signature" className="input" />
           </div>
         </section>
       </form>
-      <div className="mt-6 flex justify-end">
+      <div className="mt-6 flex justify-end space-x-4">
+        <button 
+          type="submit" 
+          form="warranty-form"
+          className="btn btn-primary"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Submitting..." : "Submit Warranty"}
+        </button>
         <PDFDownloadLink
           document={<WarrantyClaimPDF form={form} logo={logo} />}
           fileName="warranty-claim.pdf"
-          className="btn btn-primary"
+          className="btn btn-secondary"
         >
           {({ loading }) => (loading ? "Generating PDF..." : "Download PDF")}
         </PDFDownloadLink>

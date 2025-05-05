@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import nodemailer from "nodemailer"
+import { sendEmail } from '@/lib/email'
 
 export async function GET(request) {
   try {
@@ -67,6 +68,36 @@ export async function GET(request) {
       },
       { status: 500 },
     )
+  }
+}
+
+export async function POST(request) {
+  try {
+    const { to, subject, text, html } = await request.json();
+
+    if (!to || !subject || !text) {
+      return NextResponse.json(
+        { error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+
+    const result = await sendEmail({ to, subject, text, html });
+
+    if (!result.success) {
+      return NextResponse.json(
+        { error: result.error },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error in test-email route:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }
 

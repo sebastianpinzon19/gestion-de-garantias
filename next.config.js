@@ -8,17 +8,29 @@ const nextConfig = {
     APP_TITLE: 'Warranty Management System'
   },
   
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
     const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 
     config.plugins.push(new NodePolyfillPlugin());
     config.externals = [...config.externals, 'bcrypt'];
 
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        dns: false,
+        child_process: false,
+        module: false,
+      };
+    }
+
     return config;
   },
   
   images: {
-    domains: ['localhost', 'vercel.app'],
+    domains: ['localhost'],
     unoptimized: process.env.NODE_ENV === 'development'
   },
   
@@ -98,11 +110,7 @@ const nextConfig = {
     ]
   },
 
-  experimental: {
-    serverActions: {
-      enabled: true
-  }
-  },
+  output: 'standalone',
 };
 
 module.exports = nextConfig;

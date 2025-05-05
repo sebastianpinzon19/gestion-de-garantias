@@ -1,14 +1,15 @@
 import { NextResponse } from "next/server";
-import { clearTokenCookies } from "@/lib/tokens";
+import { clearTokenCookie } from "@/lib/tokens";
 
 export async function POST() {
   try {
-    clearTokenCookies();
-    
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       message: "Logged out successfully"
     });
+    
+    clearTokenCookie(response);
+    return response;
   } catch (error) {
     console.error("Error during logout:", error);
     return NextResponse.json(

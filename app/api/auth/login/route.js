@@ -1,22 +1,22 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import prisma from "@/lib/prisma";
-import { generateTokens, setTokenCookies } from "@/lib/tokens";
+import { generateToken } from "@/lib/tokens";
 
 export async function POST(request) {
   try {
     const { email, password } = await request.json();
     console.log("[LOGIN] Login attempt:", { email });
 
-    // Validate required fields
+    // Validar que se proporcionen email y password
     if (!email || !password) {
       return NextResponse.json(
-        { error: "Email and password are required" },
+        { message: 'Email and password are required' },
         { status: 400 }
       );
     }
 
-    // Find user by email
+    // Buscar el usuario en la base de datos
     const user = await prisma.user.findUnique({
       where: { email },
       select: {
@@ -24,47 +24,54 @@ export async function POST(request) {
         email: true,
         password: true,
         role: true,
-        name: true
-      }
+      },
     });
 
     console.log("[LOGIN] User found:", user ? "Yes" : "No");
+    if (user) {
+      console.log("[LOGIN] User password hash from DB:", user.password);
+    }
 
-    // Verify if user exists
+    // Verificar si el usuario existe
     if (!user) {
       return NextResponse.json(
-        { error: "Invalid credentials" },
+        { message: 'Invalid credentials' },
         { status: 401 }
       );
     }
 
-    // Verify password
+    // Verificar la contraseña
+    console.log("[LOGIN] Comparing provided password with DB hash.");
     const isValidPassword = await bcrypt.compare(password, user.password);
     console.log("[LOGIN] Valid password?:", isValidPassword);
 
     if (!isValidPassword) {
       return NextResponse.json(
-        { error: "Invalid credentials" },
+        { message: 'Invalid credentials' },
         { status: 401 }
       );
     }
 
-    // Generate tokens
-    const { accessToken, refreshToken } = generateTokens(user);
-    
-    // Set cookies
-    setTokenCookies(accessToken, refreshToken);
+    // Generar token JWT
+    const token = generateToken(user);
 
-    // Return user info without password
-    const { password: _, ...userWithoutPassword } = user;
-    return NextResponse.json({
-      user: userWithoutPassword
-    });
-
-  } catch (error) {
-    console.error("Login error:", error);
+    // Retornar respuesta exitosa
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        message: 'Login successful',
+        user: {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+        },
+        token,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("[LOGIN] Error:", error);
+    return NextResponse.json(
+      { message: 'Internal server error' },
       { status: 500 }
     );
   }

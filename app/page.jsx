@@ -46,15 +46,15 @@ export default function HomePage() {
             <h2 className="text-2xl font-semibold text-blue-300 mb-4">For Customers</h2>
             <p className="text-white/80 mb-8">
               Complete the warranty form for your product and receive updates about the status of your request.
-            </p>
+                </p>
             <button
               onClick={handleWarrantyForm}
               className="w-full bg-gradient-to-r from-blue-500 to-yellow-500 text-white py-3 rounded-lg hover:opacity-90 transition-opacity"
             >
-              Request Warranty
+                    Request Warranty
             </button>
-          </div>
-          
+              </div>
+              
           {/* For Sellers/Admins */}
           <div className="bg-gray-900/20 backdrop-blur-lg border border-yellow-500/20 rounded-lg p-8">
             <h2 className="text-2xl font-semibold text-yellow-300 mb-4">
@@ -64,7 +64,7 @@ export default function HomePage() {
               {user 
                 ? 'Manage warranty requests, update their status, and generate PDF documents.'
                 : 'Sign in to manage warranty requests, update their status, and generate PDF documents.'}
-            </p>
+                </p>
             <button
               onClick={user ? handleDashboard : handleLogin}
               className="w-full bg-gradient-to-r from-yellow-500 to-blue-500 text-white py-3 rounded-lg hover:opacity-90 transition-opacity"
