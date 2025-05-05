@@ -1,8 +1,10 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { useLanguage } from "@/context/language-context"
 
 export function PieChart({ data }) {
+  const { t } = useLanguage()
   const chartRef = useRef(null)
 
   useEffect(() => {
@@ -201,4 +203,3 @@ export function BarChart({ data }) {
 
   return <canvas ref={chartRef} width={500} height={400} className="w-full h-full" />
 }
-

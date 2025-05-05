@@ -1,55 +1,56 @@
 import { NextResponse } from "next/server"
-import { hash } from "argon2"
-import { PrismaClient } from "@prisma/client"
-
-const prisma = new PrismaClient()
+import { registerUser } from "@/lib/auth"
+import { sendWelcomeEmail } from "@/lib/email-service"
+import { verifyToken } from "@/lib/auth"
 
 export async function POST(request) {
   try {
-    const { name, email, password } = await request.json()
+    const userData = await request.json()
+    const { name, email, password, role } = userData
 
-    // Validar campos requeridos
+    // Validar datos requeridos
     if (!name || !email || !password) {
       return NextResponse.json(
-        { error: "Todos los campos son requeridos" },
-        { status: 400 }
+        { success: false, message: "Nombre, correo y contraseña son requeridos" },
+        { status: 400 },
       )
     }
 
-    // Verificar si el usuario ya existe
-    const existingUser = await prisma.user.findUnique({
-      where: { email }
-    })
+    // Si se intenta crear un usuario admin o seller, verificar que quien lo crea sea admin
+    if (role === "admin" || role === "seller") {
+      const token = request.cookies.get("token")?.value
 
-    if (existingUser) {
-      return NextResponse.json(
-        { error: "El usuario ya existe" },
-        { status: 400 }
-      )
-    }
-
-    // Encriptar contraseña
-    const hashedPassword = await hash(password)
-
-    // Crear usuario
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-        role: "user" // rol por defecto
+      if (!token) {
+        return NextResponse.json({ success: false, message: "No autorizado" }, { status: 401 })
       }
+
+      const decoded = verifyToken(token)
+
+      if (!decoded || decoded.role !== "admin") {
+        return NextResponse.json(
+          { success: false, message: "No autorizado para crear este tipo de usuario" },
+          { status: 403 },
+        )
+      }
+    }
+
+    // Registrar usuario
+    const result = await registerUser(userData)
+
+    if (!result.success) {
+      return NextResponse.json({ success: false, message: result.message }, { status: 400 })
+    }
+
+    // Enviar correo de bienvenida
+    await sendWelcomeEmail(result.user)
+
+    return NextResponse.json({
+      success: true,
+      message: "Usuario registrado correctamente",
+      user: result.user,
     })
-
-    // Retornar usuario sin la contraseña
-    const { password: _, ...userWithoutPassword } = user
-    return NextResponse.json(userWithoutPassword)
-
   } catch (error) {
-    console.error("Error al registrar usuario:", error)
-    return NextResponse.json(
-      { error: "Error al crear el usuario" },
-      { status: 500 }
-    )
+    console.error("Error en registro:", error)
+    return NextResponse.json({ success: false, message: "Error en el servidor" }, { status: 500 })
   }
-} 
+}
