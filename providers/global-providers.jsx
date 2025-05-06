@@ -1,15 +1,13 @@
 "use client"
 
-import { AuthProvider } from "./auth-provider"
-import { LanguageProvider } from "./language-provider"
-import { ThemeProvider } from "./theme-provider"
+import { ThemeProvider } from "@/providers/theme-provider"
+import { LanguageProvider } from "@/providers/language-provider"
 
 export function GlobalProviders({ children }) {
   return (
-    <LanguageProvider>
-      <ThemeProvider>
-        <AuthProvider>{children}</AuthProvider>
-      </ThemeProvider>
-    </LanguageProvider>
+    <ThemeProvider>
+      <LanguageProvider>{children}</LanguageProvider>
+    </ThemeProvider>
   )
 }
+

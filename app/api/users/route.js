@@ -1,77 +1,71 @@
+import { sql } from "@/lib/db"
 import { NextResponse } from "next/server"
-import { verifyToken } from "@/lib/auth"
-import { getAllUsers } from "@/lib/user-service"
-import { registerUser } from "@/lib/auth"
+import bcrypt from "bcryptjs"
 
 export async function GET(request) {
   try {
-    // Obtener token de la cookie
-    const token = request.cookies.get("token")?.value
-
-    if (!token) {
-      return NextResponse.json({ success: false, message: "No autenticado" }, { status: 401 })
-    }
-
-    // Verificar token
-    const decoded = verifyToken(token)
-
-    if (!decoded || decoded.role !== "admin") {
-      return NextResponse.json({ success: false, message: "No autorizado" }, { status: 403 })
-    }
-
-    // Obtener parámetros de consulta
     const { searchParams } = new URL(request.url)
     const role = searchParams.get("role")
-    const search = searchParams.get("search")
 
-    // Construir filtros
-    const filters = {}
+    // Construir la consulta SQL
+    let query = `
+      SELECT id, name, email, role, created_at
+      FROM users
+    `
+
+    // Filtrar por rol si se proporciona
     if (role) {
-      filters.role = role
-    }
-    if (search) {
-      filters.search = search
+      query += ` WHERE role = '${role}'`
     }
 
-    // Obtener usuarios
-    const users = await getAllUsers(filters)
+    query += ` ORDER BY name`
+
+    // Ejecutar la consulta
+    const users = await sql.unsafe(query)
 
     return NextResponse.json(users)
   } catch (error) {
-    console.error("Error al obtener usuarios:", error)
-    return NextResponse.json({ success: false, message: "Error al obtener usuarios" }, { status: 500 })
+    console.error("Error fetching users:", error)
+    return NextResponse.json({ success: false, message: "Error al obtener los usuarios" }, { status: 500 })
   }
 }
 
 export async function POST(request) {
   try {
-    // Obtener token de la cookie
-    const token = request.cookies.get("token")?.value
+    const { name, email, password, role } = await request.json()
 
-    if (!token) {
-      return NextResponse.json({ success: false, message: "No autenticado" }, { status: 401 })
+    // Validar datos requeridos
+    if (!name || !email || !password || !role) {
+      return NextResponse.json({ success: false, message: "Todos los campos son obligatorios" }, { status: 400 })
     }
 
-    // Verificar token
-    const decoded = verifyToken(token)
+    // Verificar si el correo ya existe
+    const existingUser = await sql`
+      SELECT * FROM users WHERE email = ${email}
+    `
 
-    if (!decoded || decoded.role !== "admin") {
-      return NextResponse.json({ success: false, message: "No autorizado" }, { status: 403 })
+    if (existingUser.length > 0) {
+      return NextResponse.json({ success: false, message: "El correo electrónico ya está registrado" }, { status: 400 })
     }
 
-    // Obtener datos del usuario
-    const userData = await request.json()
+    // Encriptar contraseña
+    const hashedPassword = await bcrypt.hash(password, 10)
 
-    // Registrar usuario
-    const result = await registerUser(userData)
+    // Insertar usuario
+    const result = await sql`
+      INSERT INTO users (name, email, password, role)
+      VALUES (${name}, ${email}, ${hashedPassword}, ${role})
+      RETURNING id, name, email, role
+    `
 
-    if (!result.success) {
-      return NextResponse.json({ success: false, message: result.message }, { status: 400 })
-    }
-
-    return NextResponse.json(result)
+    return NextResponse.json({
+      success: true,
+      message: "Usuario creado correctamente",
+      user: result[0],
+    })
   } catch (error) {
-    console.error("Error al crear usuario:", error)
-    return NextResponse.json({ success: false, message: "Error al crear usuario" }, { status: 500 })
+    console.error("Error creating user:", error)
+    return NextResponse.json({ success: false, message: "Error al crear el usuario" }, { status: 500 })
   }
 }
+

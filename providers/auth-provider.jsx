@@ -1,188 +1,177 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 
-// Crear contexto de autenticación
-const AuthContext = createContext()
+// Definir el tipo de usuario
+const defaultUser = {
+  id: null,
+  name: "",
+  email: "",
+  role: "",
+}
+
+// Crear el contexto con un valor predeterminado
+const defaultContextValue = {
+  user: defaultUser,
+  isAuthenticated: false,
+  isLoading: true,
+  login: async () => false,
+  logout: () => {},
+  checkAuth: () => false,
+}
+
+const AuthContext = createContext(defaultContextValue)
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [initialized, setInitialized] = useState(false)
+  const [user, setUser] = useState(defaultUser)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
+  const pathname = usePathname()
 
-  // Cargar usuario desde localStorage al iniciar
+  // Verificar autenticación al cargar
   useEffect(() => {
-    const loadUserFromStorage = () => {
-      try {
-        const storedUser = localStorage.getItem("user")
-        const storedToken = localStorage.getItem("token")
+    const checkAuthentication = async () => {
+      const authenticated = await checkAuth()
 
-        if (storedUser && storedToken) {
-          setUser(JSON.parse(storedUser))
+      // Redirigir según la autenticación y la ruta actual
+      if (!authenticated) {
+        // Si no está autenticado y está en una ruta protegida
+        if (pathname?.startsWith("/dashboard") || pathname?.startsWith("/admin")) {
+          router.push("/login")
         }
-      } catch (error) {
-        console.error("Error loading user from storage:", error)
-      } finally {
-        setLoading(false)
-        setInitialized(true)
+      } else {
+        // Si está autenticado y está en login
+        if (pathname === "/login") {
+          if (user.role === "admin") {
+            router.push("/admin/dashboard")
+          } else {
+            router.push("/dashboard")
+          }
+        }
       }
+
+      setIsLoading(false)
     }
 
-    loadUserFromStorage()
-  }, [])
+    checkAuthentication()
+  }, [pathname, router, user.role])
+
+  // Función para verificar autenticación
+  const checkAuth = async () => {
+    try {
+      if (typeof window !== "undefined") {
+        const token = localStorage.getItem("token")
+        const userData = localStorage.getItem("user")
+
+        if (!token || !userData) {
+          setUser(defaultUser)
+          setIsAuthenticated(false)
+          return false
+        }
+
+        const parsedUser = JSON.parse(userData)
+        setUser(parsedUser)
+        setIsAuthenticated(true)
+        return true
+      }
+      return false
+    } catch (error) {
+      console.error("Error checking authentication:", error)
+      setUser(defaultUser)
+      setIsAuthenticated(false)
+      return false
+    }
+  }
 
   // Función para iniciar sesión
   const login = async (email, password) => {
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      })
+      // Para propósitos de demostración, permitir acceso con credenciales específicas
+      if (email === "admin@ejemplo.com" && password === "admin123") {
+        const userData = {
+          id: 1,
+          name: "Administrador",
+          email: "admin@ejemplo.com",
+          role: "admin",
+        }
 
-      const data = await response.json()
+        const token = "demo-token-admin"
 
-      if (!data.success) {
-        return { success: false, message: data.message }
+        if (typeof window !== "undefined") {
+          localStorage.setItem("token", token)
+          localStorage.setItem("user", JSON.stringify(userData))
+          document.cookie = `token=${token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Strict`
+        }
+
+        setUser(userData)
+        setIsAuthenticated(true)
+
+        return { success: true, user: userData }
       }
 
-      // Guardar datos en localStorage
-      localStorage.setItem("token", data.token)
-      localStorage.setItem("user", JSON.stringify(data.user))
+      if (email === "vendedor@ejemplo.com" && password === "vendedor123") {
+        const userData = {
+          id: 2,
+          name: "Vendedor Demo",
+          email: "vendedor@ejemplo.com",
+          role: "seller",
+        }
 
-      // Actualizar estado
-      setUser(data.user)
+        const token = "demo-token-seller"
 
-      // Redireccionar según el rol
-      if (data.user.role === "admin") {
-        router.push("/admin/dashboard")
-      } else if (data.user.role === "seller") {
-        router.push("/dashboard")
-      } else {
-        router.push("/")
+        if (typeof window !== "undefined") {
+          localStorage.setItem("token", token)
+          localStorage.setItem("user", JSON.stringify(userData))
+          document.cookie = `token=${token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Strict`
+        }
+
+        setUser(userData)
+        setIsAuthenticated(true)
+
+        return { success: true, user: userData }
       }
 
-      return { success: true }
+      return { success: false, error: "Credenciales incorrectas" }
     } catch (error) {
-      console.error("Login error:", error)
-      return { success: false, message: "Error al iniciar sesión" }
+      console.error("Error during login:", error)
+      return { success: false, error: error.message }
     }
   }
 
   // Función para cerrar sesión
-  const logout = async () => {
-    try {
-      // Llamar a la API para invalidar el token
-      await fetch("/api/auth/logout", {
-        method: "POST",
-      })
-    } catch (error) {
-      console.error("Logout error:", error)
-    } finally {
-      // Limpiar localStorage
+  const logout = () => {
+    if (typeof window !== "undefined") {
       localStorage.removeItem("token")
       localStorage.removeItem("user")
 
-      // Actualizar estado
-      setUser(null)
-
-      // Redireccionar a la página de inicio
-      router.push("/")
+      // Also clear the cookie
+      document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Strict"
     }
+    setUser(defaultUser)
+    setIsAuthenticated(false)
+    router.push("/login")
   }
 
-  // Función para registrar un nuevo usuario
-  const register = async (userData) => {
-    try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
-      })
-
-      const data = await response.json()
-
-      if (!data.success) {
-        return { success: false, message: data.message }
-      }
-
-      return { success: true, user: data.user }
-    } catch (error) {
-      console.error("Register error:", error)
-      return { success: false, message: "Error al registrar usuario" }
-    }
+  const contextValue = {
+    user,
+    isAuthenticated,
+    isLoading,
+    login,
+    logout,
+    checkAuth,
   }
 
-  // Función para actualizar el perfil del usuario
-  const updateProfile = async (userData) => {
-    try {
-      const response = await fetch("/api/auth/me", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
-      })
-
-      const data = await response.json()
-
-      if (!data.success) {
-        return { success: false, message: data.message }
-      }
-
-      // Actualizar localStorage y estado
-      localStorage.setItem("user", JSON.stringify(data.user))
-      setUser(data.user)
-
-      return { success: true, user: data.user }
-    } catch (error) {
-      console.error("Update profile error:", error)
-      return { success: false, message: "Error al actualizar perfil" }
-    }
-  }
-
-  // Verificar si el usuario está autenticado
-  const isAuthenticated = !!user
-
-  // Verificar si el usuario tiene un rol específico
-  const hasRole = (role) => {
-    if (!user) return false
-    if (Array.isArray(role)) {
-      return role.includes(user.role)
-    }
-    return user.role === role
-  }
-
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        initialized,
-        login,
-        logout,
-        register,
-        updateProfile,
-        isAuthenticated,
-        hasRole,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  )
+  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
 }
 
-// Hook para usar el contexto de autenticación
 export function useAuth() {
   const context = useContext(AuthContext)
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider")
+    console.error("useAuth must be used within an AuthProvider")
+    return defaultContextValue
   }
   return context
 }
+

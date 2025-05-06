@@ -1,142 +1,93 @@
-import { NextResponse } from "next/server"
-import { verifyToken } from "@/lib/auth"
-import { getWarrantyById, updateWarranty } from "@/lib/warranty-service"
-import { sendStatusUpdateNotification } from "@/lib/email-service"
 import { sql } from "@/lib/db"
+import { NextResponse } from "next/server"
 
 export async function GET(request, { params }) {
   try {
     const { id } = params
 
-    // Obtener token de la cookie
-    const token = request.cookies.get("token")?.value
+    const warranty = await sql`
+      SELECT * FROM warranties WHERE id = ${id}
+    `
 
-    // Verificar permisos si hay token
-    if (token) {
-      const decoded = verifyToken(token)
-
-      if (decoded) {
-        // Obtener garantía
-        const warranty = await getWarrantyById(id)
-
-        if (!warranty) {
-          return NextResponse.json({ success: false, message: "Garantía no encontrada" }, { status: 404 })
-        }
-
-        // Verificar permisos según rol
-        if (decoded.role === "customer" && warranty.created_by !== decoded.id) {
-          return NextResponse.json({ success: false, message: "No autorizado" }, { status: 403 })
-        }
-
-        if (decoded.role === "seller" && warranty.assigned_to !== decoded.id) {
-          return NextResponse.json({ success: false, message: "No autorizado" }, { status: 403 })
-        }
-
-        return NextResponse.json(warranty)
-      }
-    }
-
-    // Si no hay token o es inválido, solo permitir ver garantías públicas
-    const warranty = await getWarrantyById(id)
-
-    if (!warranty) {
+    if (warranty.length === 0) {
       return NextResponse.json({ success: false, message: "Garantía no encontrada" }, { status: 404 })
     }
 
-    // Filtrar información sensible para usuarios no autenticados
-    const publicWarranty = {
-      id: warranty.id,
-      status: warranty.status,
-      brand: warranty.brand,
-      model: warranty.model,
-      created_at: warranty.created_at,
-    }
-
-    return NextResponse.json(publicWarranty)
+    return NextResponse.json(warranty[0])
   } catch (error) {
-    console.error(`Error al obtener garantía ${params.id}:`, error)
-    return NextResponse.json({ success: false, message: "Error al obtener garantía" }, { status: 500 })
+    console.error("Error fetching warranty:", error)
+    return NextResponse.json({ success: false, message: "Error al obtener la garantía" }, { status: 500 })
   }
 }
 
 export async function PUT(request, { params }) {
   try {
     const { id } = params
+    const data = await request.json()
 
-    // Obtener token de la cookie
-    const token = request.cookies.get("token")?.value
+    // Verificar si la garantía existe
+    const existingWarranty = await sql`
+      SELECT * FROM warranties WHERE id = ${id}
+    `
 
-    if (!token) {
-      return NextResponse.json({ success: false, message: "No autenticado" }, { status: 401 })
-    }
-
-    // Verificar token
-    const decoded = verifyToken(token)
-
-    if (!decoded) {
-      return NextResponse.json({ success: false, message: "Token inválido" }, { status: 401 })
-    }
-
-    // Obtener datos de la garantía
-    const warrantyData = await request.json()
-
-    // Obtener garantía actual para comparar cambios
-    const currentWarranty = await getWarrantyById(id)
-
-    if (!currentWarranty) {
+    if (existingWarranty.length === 0) {
       return NextResponse.json({ success: false, message: "Garantía no encontrada" }, { status: 404 })
     }
 
-    // Verificar permisos según rol
-    if (decoded.role === "customer" && currentWarranty.created_by !== decoded.id) {
-      return NextResponse.json({ success: false, message: "No autorizado" }, { status: 403 })
+    // Si hay cambio de estado, registrar en el historial
+    if (data.status && data.status !== existingWarranty[0].status) {
+      await sql`
+        INSERT INTO warranty_status_history (
+          warranty_id, 
+          previous_status, 
+          new_status, 
+          changed_by, 
+          observations
+        ) VALUES (
+          ${id}, 
+          ${existingWarranty[0].status}, 
+          ${data.status}, 
+          ${data.updated_by}, 
+          ${data.status_observations || null}
+        )
+      `
     }
 
-    if (decoded.role === "seller") {
-      // Los vendedores solo pueden actualizar garantías asignadas a ellos
-      if (currentWarranty.assigned_to !== decoded.id) {
-        return NextResponse.json({ success: false, message: "No autorizado" }, { status: 403 })
+    // Actualizar la garantía
+    const updateFields = []
+    const updateValues = []
+
+    // Construir dinámicamente la consulta de actualización
+    Object.entries(data).forEach(([key, value]) => {
+      if (key !== "id" && key !== "created_at" && key !== "updated_at") {
+        updateFields.push(`${key} = $${updateValues.length + 1}`)
+        updateValues.push(value)
       }
+    })
 
-      // Los vendedores solo pueden actualizar ciertos campos
-      const allowedFields = [
-        "status",
-        "technicianObservations",
-        "replacementPart",
-        "replacementPartSerial",
-        "sellerSignature",
-        "managementDate",
-        "resolutionDate",
-      ]
+    // Añadir updated_at
+    updateFields.push(`updated_at = CURRENT_TIMESTAMP`)
 
-      // Filtrar campos no permitidos
-      Object.keys(warrantyData).forEach((key) => {
-        if (!allowedFields.includes(key)) {
-          delete warrantyData[key]
-        }
-      })
-    }
+    // Añadir el ID al final para la cláusula WHERE
+    updateValues.push(id)
 
-    // Actualizar garantía
-    const updatedWarranty = await updateWarranty(id, warrantyData, decoded.id)
+    const updateQuery = `
+      UPDATE warranties 
+      SET ${updateFields.join(", ")} 
+      WHERE id = $${updateValues.length} 
+      RETURNING *
+    `
 
-    if (!updatedWarranty) {
-      return NextResponse.json({ success: false, message: "Error al actualizar garantía" }, { status: 500 })
-    }
-
-    // Si cambió el estado, enviar notificación por correo
-    if (warrantyData.status && warrantyData.status !== currentWarranty.status && currentWarranty.customer_email) {
-      await sendStatusUpdateNotification(updatedWarranty, currentWarranty.customer_email)
-    }
+    const result = await sql.unsafe(updateQuery, updateValues)
 
     return NextResponse.json({
       success: true,
       message: "Garantía actualizada correctamente",
-      warranty: updatedWarranty,
+      warranty: result[0],
     })
   } catch (error) {
-    console.error(`Error al actualizar garantía ${params.id}:`, error)
-    return NextResponse.json({ success: false, message: "Error al actualizar garantía" }, { status: 500 })
+    console.error("Error updating warranty:", error)
+    return NextResponse.json({ success: false, message: "Error al actualizar la garantía" }, { status: 500 })
   }
 }
 
@@ -144,29 +95,32 @@ export async function DELETE(request, { params }) {
   try {
     const { id } = params
 
-    // Obtener token de la cookie
-    const token = request.cookies.get("token")?.value
+    // Verificar si la garantía existe
+    const existingWarranty = await sql`
+      SELECT * FROM warranties WHERE id = ${id}
+    `
 
-    if (!token) {
-      return NextResponse.json({ success: false, message: "No autenticado" }, { status: 401 })
+    if (existingWarranty.length === 0) {
+      return NextResponse.json({ success: false, message: "Garantía no encontrada" }, { status: 404 })
     }
 
-    // Verificar token
-    const decoded = verifyToken(token)
+    // Eliminar primero los registros de historial
+    await sql`
+      DELETE FROM warranty_status_history WHERE warranty_id = ${id}
+    `
 
-    if (!decoded || decoded.role !== "admin") {
-      return NextResponse.json({ success: false, message: "No autorizado" }, { status: 403 })
-    }
-
-    // Eliminar garantía
-    await sql`DELETE FROM warranties WHERE id = ${id}`
+    // Eliminar la garantía
+    await sql`
+      DELETE FROM warranties WHERE id = ${id}
+    `
 
     return NextResponse.json({
       success: true,
       message: "Garantía eliminada correctamente",
     })
   } catch (error) {
-    console.error(`Error al eliminar garantía ${params.id}:`, error)
-    return NextResponse.json({ success: false, message: "Error al eliminar garantía" }, { status: 500 })
+    console.error("Error deleting warranty:", error)
+    return NextResponse.json({ success: false, message: "Error al eliminar la garantía" }, { status: 500 })
   }
 }
+

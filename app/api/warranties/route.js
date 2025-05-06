@@ -1,115 +1,113 @@
 import { NextResponse } from "next/server"
-import { verifyToken } from "@/lib/auth"
-import { getAllWarranties, createWarranty } from "@/lib/warranty-service"
-import { sendWarrantyNotification } from "@/lib/email-service"
+import { sendAdminNotification } from "@/lib/email-service"
 
 export async function GET(request) {
   try {
-    // Obtener parámetros de consulta
     const { searchParams } = new URL(request.url)
     const status = searchParams.get("status")
-    const search = searchParams.get("search")
 
-    // Obtener token de la cookie
-    const token = request.cookies.get("token")?.value
-    const filters = {}
+    // Mock data for warranties
+    let warranties = [
+      {
+        id: 1001,
+        customer_name: "Juan Pérez",
+        brand: "FrostCool",
+        model: "XYZ-123",
+        serial: "RF123456789",
+        created_at: "2023-05-15",
+        status: "pending",
+        credi_memo: "",
+        assigned_to: null,
+      },
+      {
+        id: 1002,
+        customer_name: "María González",
+        brand: "WashMaster",
+        model: "ABC-456",
+        serial: "LV987654321",
+        created_at: "2023-05-10",
+        status: "approved",
+        credi_memo: "CM-002",
+        assigned_to: 2,
+      },
+      {
+        id: 1003,
+        customer_name: "Carlos Rodríguez",
+        brand: "ViewTech",
+        model: "DEF-789",
+        serial: "TV567891234",
+        created_at: "2023-05-05",
+        status: "rejected",
+        credi_memo: "CM-003",
+        assigned_to: 2,
+      },
+      {
+        id: 1004,
+        customer_name: "Ana Martínez",
+        brand: "HomeHeat",
+        model: "GHI-012",
+        serial: "ES432109876",
+        created_at: "2023-05-01",
+        status: "pending",
+        credi_memo: "CM-004",
+        assigned_to: null,
+      },
+      {
+        id: 1005,
+        customer_name: "Pedro Sánchez",
+        brand: "KitchenPro",
+        model: "JKL-345",
+        serial: "MW345678912",
+        created_at: "2023-04-28",
+        status: "approved",
+        credi_memo: "CM-005",
+        assigned_to: 3,
+      },
+    ]
 
-    // Si hay token, verificarlo y aplicar filtros según el rol
-    if (token) {
-      const decoded = verifyToken(token)
-
-      if (decoded) {
-        if (decoded.role === "customer") {
-          // Los clientes solo ven sus propias garantías
-          filters.customerId = decoded.id
-        } else if (decoded.role === "seller") {
-          // Los vendedores ven las garantías asignadas a ellos
-          filters.sellerId = decoded.id
-        }
-        // Los administradores ven todas las garantías
-      }
-    }
-
-    // Aplicar filtros adicionales
+    // Filter by status if provided
     if (status && status !== "all") {
-      filters.status = status
+      warranties = warranties.filter((w) => w.status === status)
     }
-    if (search) {
-      filters.search = search
-    }
-
-    // Obtener garantías
-    const warranties = await getAllWarranties(filters)
 
     return NextResponse.json(warranties)
   } catch (error) {
-    console.error("Error al obtener garantías:", error)
-    return NextResponse.json({ success: false, message: "Error al obtener garantías" }, { status: 500 })
+    console.error("Error fetching warranties:", error)
+    return NextResponse.json([])
   }
 }
 
 export async function POST(request) {
   try {
-    // Obtener token de la cookie
-    const token = request.cookies.get("token")?.value
-    let userId = null
+    const data = await request.json()
 
-    // Si hay token, verificarlo y obtener el ID del usuario
-    if (token) {
-      const decoded = verifyToken(token)
-      if (decoded) {
-        userId = decoded.id
-      }
+    // En una implementación real, esto guardaría en la base de datos
+    // y generaría un ID único
+    const newWarranty = {
+      id: Math.floor(1000 + Math.random() * 9000), // Random ID for demo
+      ...data,
+      created_at: new Date().toISOString().split("T")[0],
+      status: "pending",
+      assigned_to: null,
     }
 
-    // Obtener datos de la garantía
-    const warrantyData = await request.json()
-
-    // Validar datos requeridos
-    const requiredFields = [
-      "customerName",
-      "customerPhone",
-      "address",
-      "brand",
-      "model",
-      "serial",
-      "purchaseDate",
-      "invoiceNumber",
-      "damagedPart",
-      "damageDate",
-      "damageDescription",
-      "customerSignature",
-    ]
-
-    const missingFields = requiredFields.filter((field) => !warrantyData[field])
-
-    if (missingFields.length > 0) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Faltan campos requeridos",
-          fields: missingFields,
-        },
-        { status: 400 },
-      )
-    }
-
-    // Crear garantía
-    const warranty = await createWarranty(warrantyData, userId)
-
-    // Enviar notificación por correo
-    const adminEmails = process.env.ADMIN_EMAILS?.split(",") || []
-    if (adminEmails.length > 0) {
-      await sendWarrantyNotification(warranty, adminEmails)
-    }
+    // Enviar notificación por correo a los administradores
+    await sendAdminNotification(newWarranty)
 
     return NextResponse.json({
       success: true,
       message: "Garantía creada correctamente",
-      warranty,
+      warranty: newWarranty,
     })
   } catch (error) {
-    console.error("Error al crear garantía:", error)
-    return NextResponse.json({ success: false, message: "Error al crear garantía" }, { status: 500 })
+    console.error("Error creating warranty:", error)
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Error al crear la garantía",
+      },
+      { status: 500 },
+    )
   }
 }
+

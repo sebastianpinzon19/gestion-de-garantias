@@ -203,3 +203,4 @@ export function BarChart({ data }) {
 
   return <canvas ref={chartRef} width={500} height={400} className="w-full h-full" />
 }
+

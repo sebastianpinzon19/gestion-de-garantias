@@ -58,13 +58,10 @@
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.6",
     "zod": "^3.24.1",
-    "nodemailer": "latest",
     "@neondatabase/serverless": "latest",
-    "uuid": "latest",
     "bcryptjs": "latest",
     "jsonwebtoken": "latest",
-    "crypto": "latest",
-    "@sendgrid/mail": "latest"
+    "nodemailer": "latest"
   },
   "devDependencies": {
     "@types/node": "^22",

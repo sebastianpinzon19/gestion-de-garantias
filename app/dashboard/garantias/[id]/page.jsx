@@ -9,8 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { useLanguage } from "@/providers/language-provider"
-import { useTheme } from "@/providers/theme-provider"
+import { useLanguage } from "@/context/language-context"
+import { useTheme } from "@/context/theme-context"
 import { Download, FileText } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
@@ -237,7 +237,7 @@ export default function DetalleGarantia({ params }) {
 
   const getEstadoBadge = (estado) => {
     switch (estado) {
-      case "pending":
+      case "pendiente":
         return (
           <Badge
             variant="outline"
@@ -246,7 +246,7 @@ export default function DetalleGarantia({ params }) {
             {t("pending")}
           </Badge>
         )
-      case "approved":
+      case "aprobada":
         return (
           <Badge
             variant="outline"
@@ -255,7 +255,7 @@ export default function DetalleGarantia({ params }) {
             {t("approved")}
           </Badge>
         )
-      case "rejected":
+      case "rechazada":
         return (
           <Badge
             variant="outline"
@@ -278,7 +278,7 @@ export default function DetalleGarantia({ params }) {
           </h1>
           <div className="flex items-center gap-2 mt-1">
             <span className="text-gray-700 dark:text-gray-300">{t("status")}:</span>
-            {getEstadoBadge(garantia.status)}
+            {getEstadoBadge(garantia.estadoGarantia)}
           </div>
         </div>
         <div className="flex gap-2">
@@ -362,35 +362,35 @@ export default function DetalleGarantia({ params }) {
                     <div>
                       <Label className="text-gray-700 dark:text-gray-300">{t("customerName")}</Label>
                       <p className="text-gray-700 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded-md">
-                        {garantia.customer_name}
+                        {garantia.nombreCliente}
                       </p>
                     </div>
                     <div>
                       <Label className="text-gray-700 dark:text-gray-300">{t("customerPhone")}</Label>
                       <p className="text-gray-700 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded-md">
-                        {garantia.customer_phone}
+                        {garantia.telefonoCliente}
                       </p>
                     </div>
-                    {garantia.owner_name && (
+                    {garantia.nombreDueno && (
                       <div>
                         <Label className="text-gray-700 dark:text-gray-300">{t("ownerName")}</Label>
                         <p className="text-gray-700 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded-md">
-                          {garantia.owner_name}
+                          {garantia.nombreDueno}
                         </p>
                       </div>
                     )}
-                    {garantia.owner_phone && (
+                    {garantia.telefonoDueno && (
                       <div>
                         <Label className="text-gray-700 dark:text-gray-300">{t("ownerPhone")}</Label>
                         <p className="text-gray-700 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded-md">
-                          {garantia.owner_phone}
+                          {garantia.telefonoDueno}
                         </p>
                       </div>
                     )}
                     <div>
                       <Label className="text-gray-700 dark:text-gray-300">{t("address")}</Label>
                       <p className="text-gray-700 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded-md">
-                        {garantia.address}
+                        {garantia.direccionCasa}
                       </p>
                     </div>
                   </div>
@@ -402,31 +402,31 @@ export default function DetalleGarantia({ params }) {
                     <div>
                       <Label className="text-gray-700 dark:text-gray-300">{t("brand")}</Label>
                       <p className="text-gray-700 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded-md">
-                        {garantia.brand}
+                        {garantia.marcaEquipo}
                       </p>
                     </div>
                     <div>
                       <Label className="text-gray-700 dark:text-gray-300">{t("model")}</Label>
                       <p className="text-gray-700 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded-md">
-                        {garantia.model}
+                        {garantia.modeloEquipo}
                       </p>
                     </div>
                     <div>
                       <Label className="text-gray-700 dark:text-gray-300">{t("serial")}</Label>
                       <p className="text-gray-700 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded-md">
-                        {garantia.serial}
+                        {garantia.serialEquipo}
                       </p>
                     </div>
                     <div>
                       <Label className="text-gray-700 dark:text-gray-300">{t("purchaseDate")}</Label>
                       <p className="text-gray-700 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded-md">
-                        {garantia.purchase_date}
+                        {garantia.fechaCompra}
                       </p>
                     </div>
                     <div>
                       <Label className="text-gray-700 dark:text-gray-300">{t("invoiceNumber")}</Label>
                       <p className="text-gray-700 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded-md">
-                        {garantia.invoice_number}
+                        {garantia.numeroFactura}
                       </p>
                     </div>
                   </div>
@@ -439,38 +439,38 @@ export default function DetalleGarantia({ params }) {
                   <div>
                     <Label className="text-gray-700 dark:text-gray-300">{t("damagedPart")}</Label>
                     <p className="text-gray-700 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded-md">
-                      {garantia.damaged_part}
+                      {garantia.parteDanada}
                     </p>
                   </div>
-                  {garantia.damaged_part_serial && (
+                  {garantia.serialParteDanada && (
                     <div>
                       <Label className="text-gray-700 dark:text-gray-300">{t("damagedPartSerial")}</Label>
                       <p className="text-gray-700 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded-md">
-                        {garantia.damaged_part_serial}
+                        {garantia.serialParteDanada}
                       </p>
                     </div>
                   )}
                   <div>
                     <Label className="text-gray-700 dark:text-gray-300">{t("damageDate")}</Label>
                     <p className="text-gray-700 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded-md">
-                      {garantia.damage_date}
+                      {garantia.fechaDano}
                     </p>
                   </div>
                 </div>
                 <div>
                   <Label className="text-gray-700 dark:text-gray-300">{t("damageDescription")}</Label>
                   <p className="text-gray-700 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded-md">
-                    {garantia.damage_description}
+                    {garantia.descripcionDano}
                   </p>
                 </div>
               </div>
 
               <div>
                 <h3 className="text-lg font-medium mb-2 text-gray-900 dark:text-white">{t("customerSignature")}</h3>
-                {garantia.customer_signature ? (
+                {garantia.firmaCliente ? (
                   <div className="p-2 border rounded-md bg-gray-50 dark:bg-gray-700">
                     <img
-                      src={garantia.customer_signature || "/placeholder.svg"}
+                      src={garantia.firmaCliente || "/placeholder.svg"}
                       alt={t("customerSignature")}
                       className="max-h-32 mx-auto"
                     />
@@ -619,3 +619,4 @@ export default function DetalleGarantia({ params }) {
     </div>
   )
 }
+

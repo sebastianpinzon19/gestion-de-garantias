@@ -195,3 +195,4 @@
 .tooltip {
   @apply absolute z-10 px-2 py-1 text-xs font-medium text-white bg-gray-900 rounded-md shadow-sm dark:bg-gray-700;
 }
+

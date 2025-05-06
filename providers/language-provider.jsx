@@ -3,51 +3,85 @@
 import { createContext, useContext, useState, useEffect } from "react"
 import { translations } from "@/lib/translations"
 
-const LanguageContext = createContext({
+// Crear el contexto con un valor predeterminado
+const defaultContextValue = {
   language: "es",
   setLanguage: () => {},
-  t: (key) => key,
-})
+  toggleLanguage: () => {},
+  t: (key) => {
+    // Proporcionar una traducción predeterminada incluso antes de que el contexto esté listo
+    const defaultLang = "es"
+    if (!translations[defaultLang][key]) {
+      return key
+    }
+    return translations[defaultLang][key]
+  },
+}
+
+const LanguageContext = createContext(defaultContextValue)
 
 export function LanguageProvider({ children }) {
   const [language, setLanguage] = useState("es")
+  const [mounted, setMounted] = useState(false)
 
-  // Cargar idioma guardado
+  // Cargar preferencia de idioma del localStorage al iniciar
   useEffect(() => {
-    const savedLanguage = localStorage.getItem("language")
-    if (savedLanguage) {
-      setLanguage(savedLanguage)
+    setMounted(true)
+    if (typeof window !== "undefined") {
+      try {
+        const savedLanguage = localStorage.getItem("preferredLanguage") || "es"
+        setLanguage(savedLanguage)
+      } catch (error) {
+        console.error("Error loading language preference:", error)
+      }
     }
   }, [])
 
-  // Guardar idioma seleccionado
-  const changeLanguage = (lang) => {
-    setLanguage(lang)
-    localStorage.setItem("language", lang)
-  }
+  // Guardar preferencia de idioma en localStorage
+  useEffect(() => {
+    if (typeof window !== "undefined" && mounted) {
+      try {
+        localStorage.setItem("preferredLanguage", language)
+      } catch (error) {
+        console.error("Error saving language preference:", error)
+      }
+    }
+  }, [language, mounted])
 
-  // Función para traducir textos
   const t = (key) => {
     if (!translations[language] || !translations[language][key]) {
-      // Fallback a español si no se encuentra la traducción
-      return translations.es[key] || key
+      // console.warn(`Translation missing for key: ${key} in language: ${language}`)
+      return key
     }
     return translations[language][key]
   }
 
-  return (
-    <LanguageContext.Provider
-      value={{
-        language,
-        setLanguage: changeLanguage,
-        t,
-      }}
-    >
-      {children}
-    </LanguageContext.Provider>
-  )
+  const toggleLanguage = () => {
+    setLanguage((prevLang) => (prevLang === "es" ? "en" : "es"))
+  }
+
+  const contextValue = {
+    language,
+    setLanguage,
+    toggleLanguage,
+    t,
+  }
+
+  // Evitar problemas de hidratación renderizando solo cuando el componente está montado
+  if (!mounted) {
+    return <>{children}</>
+  }
+
+  return <LanguageContext.Provider value={contextValue}>{children}</LanguageContext.Provider>
 }
 
 export function useLanguage() {
-  return useContext(LanguageContext)
+  const context = useContext(LanguageContext)
+  if (context === undefined) {
+    console.error("useLanguage must be used within a LanguageProvider")
+    // Devolver un valor predeterminado para evitar errores
+    return defaultContextValue
+  }
+  return context
 }
+

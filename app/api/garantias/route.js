@@ -1,64 +1,65 @@
-import { NextResponse } from "next/server"
-import { getAllWarranties, createWarranty } from "@/lib/warranty-service"
-import { verifyToken } from "@/lib/auth"
-
 export async function GET(request) {
-  try {
-    // Obtener parámetros de consulta
-    const { searchParams } = new URL(request.url)
-    const status = searchParams.get("status")
-    const search = searchParams.get("search")
-    const createdBy = searchParams.get("createdBy")
-    const assignedTo = searchParams.get("assignedTo")
+  // En una implementación real, aquí se consultaría la base de datos
+  const garantias = [
+    {
+      id: 1001,
+      cliente: "Juan Pérez",
+      producto: "Refrigerador XYZ-123",
+      serial: "RF123456789",
+      fechaSolicitud: "2023-05-15",
+      estado: "pendiente",
+      crediMemo: "",
+    },
+    {
+      id: 1002,
+      cliente: "María González",
+      producto: "Lavadora ABC-456",
+      serial: "LV987654321",
+      fechaSolicitud: "2023-05-10",
+      estado: "aprobada",
+      crediMemo: "CM-002",
+    },
+    {
+      id: 1003,
+      cliente: "Carlos Rodríguez",
+      producto: "Televisor DEF-789",
+      serial: "TV567891234",
+      fechaSolicitud: "2023-05-05",
+      estado: "rechazada",
+      crediMemo: "CM-003",
+    },
+  ]
 
-    // Construir filtros
-    const filters = {}
-    if (status) filters.status = status
-    if (search) filters.search = search
-    if (createdBy) filters.createdBy = createdBy
-    if (assignedTo) filters.assignedTo = assignedTo
-
-    // Obtener garantías
-    const result = await getAllWarranties(filters)
-
-    if (!result.success) {
-      return NextResponse.json({ success: false, message: result.message }, { status: 400 })
-    }
-
-    return NextResponse.json(result.warranties)
-  } catch (error) {
-    console.error("Error al obtener garantías:", error)
-    return NextResponse.json({ success: false, message: "Error en el servidor" }, { status: 500 })
-  }
+  return Response.json(garantias)
 }
 
 export async function POST(request) {
   try {
-    // Obtener token de la cookie
-    const token = request.cookies.get("token")?.value
+    const data = await request.json()
 
-    // Verificar token
-    let userId = null
-    if (token) {
-      const { valid, decoded } = verifyToken(token)
-      if (valid) {
-        userId = decoded.userId
-      }
+    // En una implementación real, aquí se guardaría en la base de datos
+    // y se generaría un ID único
+
+    const nuevaGarantia = {
+      id: Math.floor(1000 + Math.random() * 9000), // ID aleatorio para demo
+      ...data,
+      fechaSolicitud: new Date().toISOString().split("T")[0],
+      estado: "pendiente",
     }
 
-    // Obtener datos de la garantía
-    const warrantyData = await request.json()
-
-    // Crear garantía
-    const result = await createWarranty(warrantyData, userId)
-
-    if (!result.success) {
-      return NextResponse.json({ success: false, message: result.message }, { status: 400 })
-    }
-
-    return NextResponse.json({ success: true, warranty: result.warranty }, { status: 201 })
+    return Response.json({
+      success: true,
+      mensaje: "Garantía creada correctamente",
+      garantia: nuevaGarantia,
+    })
   } catch (error) {
-    console.error("Error al crear garantía:", error)
-    return NextResponse.json({ success: false, message: "Error en el servidor" }, { status: 500 })
+    return Response.json(
+      {
+        success: false,
+        mensaje: "Error al crear la garantía",
+      },
+      { status: 500 },
+    )
   }
 }
+
