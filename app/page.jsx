@@ -1,93 +1,91 @@
 "use client"
 
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { useAuth } from "@/providers/auth-provider"
-import { Button } from "@/components/ui/button"
-import { useLanguage } from "@/providers/language-provider"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import ThemeSwitcher from "@/components/common/theme-switcher"
-import LanguageSwitcher from "@/components/common/language-switcher"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useAuth } from "@/providers/auth-provider"
 
 export default function Home() {
-  const { isAuthenticated, user, isLoading } = useAuth()
-  const router = useRouter()
-  const { t } = useLanguage()
+  const { user, isAuthenticated, isLoading } = useAuth()
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      // Redirigir según el rol
-      if (user?.role === "admin") {
-        router.push("/admin/dashboard")
-      } else if (user?.role === "seller") {
-        router.push("/vendedor/dashboard")
-      } else if (user?.role === "customer") {
-        router.push("/cliente/dashboard")
-      }
-    }
-  }, [isLoading, isAuthenticated, user, router])
+    setMounted(true)
+  }, [])
 
+  if (!mounted || isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    )
+  }
+
+  // If user is authenticated, redirect to appropriate dashboard
+  if (isAuthenticated) {
+    if (user?.role === "seller") {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-900">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-white mb-6">Welcome to Warranty Management System</h1>
+            <div className="space-y-4">
+              <Link href="/seller/warranties">
+                <Button className="w-full bg-blue-600 hover:bg-blue-700">Go to Warranty Dashboard</Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      )
+    } else {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-900">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-white mb-6">Welcome to Warranty Management System</h1>
+            <div className="space-y-4">
+              <Link href="/warranty/new">
+                <Button className="w-full bg-blue-600 hover:bg-blue-700">Submit New Warranty</Button>
+              </Link>
+              <Link href="/customer/warranties">
+                <Button className="w-full bg-gray-700 hover:bg-gray-800">View My Warranties</Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      )
+    }
+  }
+
+  // If not authenticated, show login/register options
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="bg-gradient-to-r from-blue-600 via-blue-500 to-yellow-500 text-white shadow-md">
-        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">{t("warrantySystem")}</h1>
-          <div className="flex items-center gap-3">
-            <LanguageSwitcher />
-            <ThemeSwitcher />
+    <div className="min-h-screen flex items-center justify-center bg-gray-900">
+      <Card className="w-full max-w-md border-blue-500 dark:border-blue-700">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-center">Warranty Management System</CardTitle>
+          <CardDescription className="text-center">Manage product warranties efficiently</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
             <Link href="/login">
-              <Button className="bg-white text-blue-600 hover:bg-blue-50">{t("login")}</Button>
+              <Button className="w-full bg-blue-600 hover:bg-blue-700">Login</Button>
             </Link>
           </div>
-        </div>
-      </header>
-
-      <main className="flex-1 flex flex-col items-center justify-center p-6 bg-gray-50 dark:bg-gray-800 transition-colors duration-200">
-        <div className="max-w-4xl w-full text-center space-y-8">
-          <h2 className="text-4xl font-bold text-blue-600 dark:text-blue-400">{t("warrantySystem")}</h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300">
-            Sistema completo para la gestión de garantías de productos
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-            <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
-              <h3 className="text-xl font-bold text-blue-600 dark:text-blue-400 mb-4">{t("customer")}</h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-6">
-                Solicita garantías para tus productos y realiza seguimiento a tus solicitudes
-              </p>
-              <Link href="/garantia/nueva">
-                <Button className="w-full bg-blue-600 hover:bg-blue-700">{t("newWarranty")}</Button>
-              </Link>
-            </div>
-
-            <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
-              <h3 className="text-xl font-bold text-yellow-600 dark:text-yellow-400 mb-4">{t("seller")}</h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-6">
-                Gestiona las solicitudes de garantía de tus clientes y mantén un registro de todas las garantías
-              </p>
-              <Link href="/login">
-                <Button className="w-full bg-yellow-600 hover:bg-yellow-700">{t("login")}</Button>
-              </Link>
-            </div>
-
-            <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
-              <h3 className="text-xl font-bold text-green-600 dark:text-green-400 mb-4">{t("admin")}</h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-6">
-                Administra usuarios, visualiza estadísticas y supervisa todo el sistema de garantías
-              </p>
-              <Link href="/login">
-                <Button className="w-full bg-green-600 hover:bg-green-700">{t("login")}</Button>
-              </Link>
-            </div>
+          <div className="space-y-2">
+            <Link href="/register">
+              <Button variant="outline" className="w-full">
+                Register
+              </Button>
+            </Link>
           </div>
-        </div>
-      </main>
-
-      <footer className="bg-gray-100 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-6">
-        <div className="container mx-auto px-4 text-center text-gray-600 dark:text-gray-400">
-          <p>&copy; 2023 Sistema de Garantías. Todos los derechos reservados.</p>
-        </div>
-      </footer>
+          <div className="space-y-2">
+            <Link href="/warranty/new">
+              <Button variant="outline" className="w-full">
+                Submit Warranty (No Account Required)
+              </Button>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

@@ -63,7 +63,8 @@
     "uuid": "latest",
     "bcryptjs": "latest",
     "jsonwebtoken": "latest",
-    "crypto": "latest"
+    "crypto": "latest",
+    "@sendgrid/mail": "latest"
   },
   "devDependencies": {
     "@types/node": "^22",
